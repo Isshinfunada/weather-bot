@@ -1,0 +1,38 @@
+// 列挙型の定義
+Enum CityID {
+  "130000" // 東京
+  "270000" // 大阪
+  "140000" // 札幌
+  "230000" // 名古屋
+  "400000" // 福岡
+  // 必要に応じて他の主要都市コードを追加
+}
+
+// users テーブル
+Table users {
+  id SERIAL [pk, increment] // ユーザーの一意識別子
+  line_user_id VARCHAR(255) [unique, not null] // LINEユーザーID
+  access_token VARCHAR(255) [not null] // LINE Messaging API用アクセストークン
+  selected_city_id CityID [not null] // ユーザーが選択した都市のID（列挙型）
+  created_at TIMESTAMP [default: `CURRENT_TIMESTAMP`] // レコード作成日時
+  updated_at TIMESTAMP [default: `CURRENT_TIMESTAMP`] // レコード更新日時
+}
+
+// notification_settings テーブル
+Table notification_settings {
+  id SERIAL [pk, increment] // 通知設定の一意識別子
+  user_id INTEGER [ref: > users.id, not null] // ユーザーID（外部キー）
+  notify_time TIME [not null] // 通知を行う時刻（例: 08:00）
+  timezone VARCHAR(50) [default: 'Asia/Tokyo'] // ユーザーのタイムゾーン
+  created_at TIMESTAMP [default: `CURRENT_TIMESTAMP`] // レコード作成日時
+  updated_at TIMESTAMP [default: `CURRENT_TIMESTAMP`] // レコード更新日時
+}
+
+// notification_history テーブル
+Table notification_history {
+  id SERIAL [pk, increment] // 通知履歴の一意識別子
+  user_id INTEGER [ref: > users.id, not null] // ユーザーID（外部キー）
+  notification_time TIMESTAMP [not null] // 通知が送信された日時
+  weather_data JSONB // 送信された天気情報のデータ
+  created_at TIMESTAMP [default: `CURRENT_TIMESTAMP`] // レコード作成日時
+}
