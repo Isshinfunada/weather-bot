@@ -16,7 +16,7 @@ ingress:
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
   hosts:
-    - host: your-domain.com
+    - host: paraponerainy.duckdns.org
       paths:
         - path: /webhook
           pathType: Prefix
@@ -24,10 +24,7 @@ ingress:
 
 env:
   - name: DB_URL
-    valueFrom:
-      secretKeyRef:
-        name: postgres-secret
-        key: db_url
+    value: "postgresql://username:password@postgres.weather-bot.svc.cluster.local:5432/weather-bot?sslmode=disable"
   - name: LINE_CHANNEL_ACCESS_TOKEN
     valueFrom:
       secretKeyRef:
@@ -38,3 +35,16 @@ env:
       secretKeyRef:
         name: line-api-secret
         key: channel_secret
+
+serviceAccount:
+  create: true
+  # name: "" # 必要に応じてカスタム名を指定
+  automount: true
+  # annotations: {} # 必要に応じてアノテーションを追加
+
+autoscaling:
+  enabled: false  # HPAを有効にする場合は true に変更
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80  # CPU使用率のターゲット
+  targetMemoryUtilizationPercentage: 70  # メモリ使用率のターゲット
