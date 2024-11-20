@@ -24,7 +24,10 @@ ingress:
 
 env:
   - name: DB_URL
-    value: "postgresql://username:password@postgres.weather-bot.svc.cluster.local:5432/weather-bot?sslmode=disable"
+    valueFrom:
+      secretKeyRef:
+        name: postgres-secret
+        key: db_url
   - name: LINE_CHANNEL_ACCESS_TOKEN
     valueFrom:
       secretKeyRef:
