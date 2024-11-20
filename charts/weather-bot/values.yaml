@@ -1,6 +1,33 @@
+# weather-bot/values.yaml
+
+replicaCount: 2
+
+image:
+  repository: isshinfunada/weather-bot  # Docker Hubのリポジトリ名
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: true
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  hosts:
+    - host: your-domain.com
+      paths:
+        - path: /webhook
+          pathType: Prefix
+  tls: []  # TLS設定が必要な場合はここに追加
+
 env:
   - name: DB_URL
-    value: "postgresql://username:password@postgres-postgresql.database.svc.cluster.local:5432/weather-bot?sslmode=disable"
+    valueFrom:
+      secretKeyRef:
+        name: postgres-secret
+        key: db_url
   - name: LINE_CHANNEL_ACCESS_TOKEN
     valueFrom:
       secretKeyRef:
