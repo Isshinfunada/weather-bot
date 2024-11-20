@@ -11,6 +11,9 @@ RUN go mod download
 # アプリケーションのソースコードをコピー
 COPY . .
 
+# マイグレーションファイルをコピー
+COPY migrations ./migrations
+
 # バイナリをビルド
 RUN go build -o weather-bot ./cmd/main.go
 
@@ -19,8 +22,12 @@ FROM alpine:latest
 
 WORKDIR /root/
 
-# ビルドされたバイナリをコピー
+# 必要なパッケージをインストール
+RUN apk add --no-cache ca-certificates
+
+# ビルドされたバイナリとマイグレーションファイルをコピー
 COPY --from=builder /app/weather-bot .
+COPY --from=builder /app/migrations ./migrations
 
 # 実行
 CMD ["./weather-bot"]
