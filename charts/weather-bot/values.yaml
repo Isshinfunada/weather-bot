@@ -1,0 +1,13 @@
+env:
+  - name: DB_URL
+    value: "postgresql://username:password@postgres-postgresql.database.svc.cluster.local:5432/weather-bot?sslmode=disable"
+  - name: LINE_CHANNEL_ACCESS_TOKEN
+    valueFrom:
+      secretKeyRef:
+        name: line-api-secret
+        key: access_token
+  - name: LINE_CHANNEL_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: line-api-secret
+        key: channel_secret
