@@ -4,9 +4,6 @@ global:
   postgresql:
     auth:
       existingSecret: "postgres-secret"  # 作成したSecretの名前
-      username: "username"                # Secretに保存されているユーザー名
-      password: "password"                # Secretに保存されているパスワード
-      database: "weather-bot"             # デフォルトデータベース名
 
 postgresql:
   fullnameOverride: "postgres"            # リリース名をカスタマイズ
