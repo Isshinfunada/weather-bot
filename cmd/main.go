@@ -1,3 +1,4 @@
+// cmd/main.go
 package main
 
 import (
@@ -66,6 +67,12 @@ func main() {
             "id":           user.ID,
             "line_user_id": user.LineUserID,
         })
+    })
+
+    // Webhook エンドポイントの追加
+    e.POST("/webhook", func(c echo.Context) error {
+        // Webhook 処理ロジックをここに実装
+        return c.JSON(http.StatusOK, map[string]string{"message": "Webhook received"})
     })
 
     e.Logger.Fatal(e.Start(":8080"))
