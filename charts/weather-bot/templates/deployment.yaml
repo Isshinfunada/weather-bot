@@ -66,3 +66,30 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+
+env:
+  - name: POSTGRES_USER
+    valueFrom:
+      secretKeyRef:
+        name: postgres-secret
+        key: postgresql-username
+  - name: POSTGRES_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: postgres-secret
+        key: postgresql-password
+  - name: POSTGRES_DB
+    valueFrom:
+      secretKeyRef:
+        name: postgres-secret
+        key: postgresql-database
+  - name: LINE_CHANNEL_ACCESS_TOKEN
+    valueFrom:
+      secretKeyRef:
+        name: line-api-secret
+        key: access_token
+  - name: LINE_CHANNEL_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: line-api-secret
+        key: channel_secret
