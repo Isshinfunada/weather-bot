@@ -1,11 +1,20 @@
+-- migrations/001_create_tables.sql
+
 -- +migrate Up
-CREATE TABLE test_data (
+CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     line_user_id VARCHAR(255) UNIQUE NOT NULL,
-    message TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE messages (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- +migrate Down
-DROP TABLE test_data;
+DROP TABLE messages;
+DROP TABLE users;
