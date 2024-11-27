@@ -15,10 +15,10 @@ services:
     ports:
       - "8080:8080"
     environment:
-      DATABASE_URL: postgres://user:password@db:5432/todos?sslmode=disable
+      - DATABASE_URL=${DATABASE_URL}
+      - LINE_CHANNEL_ACCESS_TOKEN=${LINE_CHANNEL_ACCESS_TOKEN}
+      - LINE_CHANNEL_SECRET=${LINE_CHANNEL_SECRET}
     depends_on:
-      - db
-      - migrate
 
   db:
     image: postgres:16.4-alpine3.20
