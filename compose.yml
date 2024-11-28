@@ -1,12 +1,4 @@
 services:
-  client:
-    build: ./client/my-nuxt-app
-    volumes:
-      - ./client/my-nuxt-app:/app
-      - /app/node_modules
-    ports:
-      - "3000:3000"
-    command: sh -c "yarn install && yarn dev"
 
   server:
     build: ./server
@@ -25,7 +17,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
-      POSTGRES_DB: todos
+      POSTGRES_DB: weather-bot
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
     ports:
