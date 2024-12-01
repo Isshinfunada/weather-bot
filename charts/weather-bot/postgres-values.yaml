@@ -1,0 +1,16 @@
+global:
+  postgresql:
+    auth:
+      existingSecret: "postgres-secret"  # 作成した Secret の名前
+
+postgresql:
+  fullnameOverride: "postgres"            # リリース名をカスタマイズ
+  service:
+    port: 5432                             # PostgreSQL のデフォルトポート
+  persistence:
+    enabled: true
+    size: 8Gi                              # 永続ボリュームのサイズ
+  auth:
+    username: "user"                   # Secret に保存されたユーザー名
+    password: "password"                   # Secret に保存されたパスワード
+    database: "weather-bot"                # Secret に保存されたデータベース名

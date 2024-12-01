@@ -29,21 +29,21 @@ env:
       secretKeyRef:
         name: postgres-secret
         key: db_url
-  - name: POSTGRES_USER
+  - name: POSTGRESQL_USER
     valueFrom:
       secretKeyRef:
         name: postgres-secret
-        key: postgres-user  # シークレットのキー
-  - name: POSTGRES_PASSWORD
+        key: postgresql-username  # シークレットのキー
+  - name: POSTGRESQL_PASSWORD
     valueFrom:
       secretKeyRef:
         name: postgres-secret
-        key: postgres-password  # シークレットのキー
-  - name: POSTGRES_DB
+        key: postgresql-password  # シークレットのキー
+  - name: POSTGRESQL_DATABASE
     valueFrom:
       secretKeyRef:
         name: postgres-secret
-        key: postgres-db
+        key: postgresql-database
   - name: LINE_CHANNEL_ACCESS_TOKEN
     valueFrom:
       secretKeyRef:
