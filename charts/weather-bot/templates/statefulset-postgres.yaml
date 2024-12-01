@@ -1,0 +1,52 @@
+# charts/weather-bot/templates/statefulset-postgres.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "weather-bot.fullname" . }}-postgres
+  labels:
+    {{- include "weather-bot.labels" . | nindent 4 }}
+spec:
+  serviceName: "{{ include "weather-bot.fullname" . }}-postgres"
+  replicas: {{ .Values.postgresql.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "weather-bot.name" . }}-postgres
+  template:
+    metadata:
+      labels:
+        app: {{ include "weather-bot.name" . }}-postgres
+    spec:
+      containers:
+        - name: postgres
+          image: "{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}"
+          ports:
+            - containerPort: 5432
+              name: postgres
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.postgresql.existingSecret }}
+                  key: postgresql-username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.postgresql.existingSecret }}
+                  key: postgresql-password
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.postgresql.existingSecret }}
+                  key: postgresql-database
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-storage
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: "{{ .Values.postgresql.storageClass }}"
+        resources:
+          requests:
+            storage: {{ .Values.postgresql.storageSize }}
