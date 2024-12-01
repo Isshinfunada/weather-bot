@@ -11,6 +11,18 @@ postgresql:
     enabled: true
     size: 8Gi                              # 永続ボリュームのサイズ
   auth:
-    username: "user"                   # Secret に保存されたユーザー名
-    password: "password"                   # Secret に保存されたパスワード
-    database: "weather-bot"                # Secret に保存されたデータベース名
+    username: 
+      valueFrom:
+        secretKeyRef:
+          name: {{ .Values.global.postgresql.auth.existingSecret }}
+          key: postgresql-username         # Secret に保存されたユーザー名のキー
+    password: 
+      valueFrom:
+        secretKeyRef:
+          name: {{ .Values.global.postgresql.auth.existingSecret }}
+          key: postgresql-password         # Secret に保存されたパスワードのキー
+    database: 
+      valueFrom:
+        secretKeyRef:
+          name: {{ .Values.global.postgresql.auth.existingSecret }}
+          key: postgresql-database         # Secret に保存されたデータベース名のキー
