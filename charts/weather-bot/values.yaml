@@ -23,6 +23,14 @@ ingress:
           pathType: Prefix
   tls: []  # TLS設定が必要な場合はここに追加
 
+storageClass:
+  create: false                       # 既存のStorageClassを使用
+  name: "local-path"                  # クラスターに存在するStorageClass名
+  provisioner: ""
+  reclaimPolicy: ""
+  volumeBindingMode: ""
+  parameters: {}
+
 postgresql:
   replicaCount: 1
   existingSecret: "postgres-secret"
