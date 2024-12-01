@@ -15,6 +15,7 @@ ingress:
   enabled: true
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
   hosts:
     - host: paraponerainy.duckdns.org
       paths:
@@ -52,18 +53,4 @@ autoscaling:
   targetCPUUtilizationPercentage: 80  # CPU使用率のターゲット
   targetMemoryUtilizationPercentage: 70  # メモリ使用率のターゲット
 
-ingress:
-  enabled: true
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
-    # Let's Encrypt などの証明書マネージャーを使用する場合
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
-  hosts:
-    - host: paraponerainy.duckdns.org
-      paths:
-        - path: /webhook
-          pathType: Prefix
-  tls:
-    - hosts:
-        - paraponerainy.duckdns.org
-      secretName: weather-bot-tls
+
