@@ -1,0 +1,4 @@
+# .sops.yaml
+creation_rules:
+  - path_regex: 'build/kubernetes/.*\.yaml$'
+    pgp: '94BB758C8D3708CEA59F7C12B7C3FC5576616ACA'

@@ -1,0 +1,14 @@
+# charts/weather-bot/templates/service-postgres.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "weather-bot.fullname" . }}-postgres
+  labels:
+    {{- include "weather-bot.labels" . | nindent 4 }}
+spec:
+  ports:
+    - port: 5432
+      name: postgres
+  clusterIP: None  # Headless Service
+  selector:
+    app: {{ include "weather-bot.name" . }}-postgres

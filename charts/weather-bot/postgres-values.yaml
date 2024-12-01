@@ -1,0 +1,28 @@
+global:
+  postgresql:
+    auth:
+      existingSecret: "postgres-secret"  # 作成した Secret の名前
+
+postgresql:
+  fullnameOverride: "postgres"            # リリース名をカスタマイズ
+  service:
+    port: 5432                             # PostgreSQL のデフォルトポート
+  persistence:
+    enabled: true
+    size: 8Gi                              # 永続ボリュームのサイズ
+  auth:
+    username: 
+      valueFrom:
+        secretKeyRef:
+          name: {{ .Values.global.postgresql.auth.existingSecret }}
+          key: postgresql-username         # Secret に保存されたユーザー名のキー
+    password: 
+      valueFrom:
+        secretKeyRef:
+          name: {{ .Values.global.postgresql.auth.existingSecret }}
+          key: postgresql-password         # Secret に保存されたパスワードのキー
+    database: 
+      valueFrom:
+        secretKeyRef:
+          name: {{ .Values.global.postgresql.auth.existingSecret }}
+          key: postgresql-database         # Secret に保存されたデータベース名のキー

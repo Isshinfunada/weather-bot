@@ -1,0 +1,88 @@
+# weather-bot/values.yaml
+
+replicaCount: 2
+
+image:
+  repository: isshinfunada/weather-bot  # Docker Hubのリポジトリ名
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: true
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: paraponerainy.duckdns.org
+      paths:
+        - path: /webhook
+          pathType: Prefix
+  tls: []  # TLS設定が必要な場合はここに追加
+
+storageClass:
+  create: false                       # 既存のStorageClassを使用
+  name: "local-path"                  # クラスターに存在するStorageClass名
+  provisioner: ""
+  reclaimPolicy: ""
+  volumeBindingMode: ""
+  parameters: {}
+
+postgresql:
+  replicaCount: 1
+  existingSecret: "postgres-secret"
+  image:
+    repository: postgres
+    tag: "16.4-alpine3.20"
+  storageClass: "local-path"
+  storageSize: "8Gi"
+
+env:
+  - name: DB_URL
+    valueFrom:
+      secretKeyRef:
+        name: postgres-secret
+        key: db_url
+  - name: POSTGRESQL_USER
+    valueFrom:
+      secretKeyRef:
+        name: postgres-secret
+        key: postgresql-username  # シークレットのキー
+  - name: POSTGRESQL_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: postgres-secret
+        key: postgresql-password  # シークレットのキー
+  - name: POSTGRESQL_DATABASE
+    valueFrom:
+      secretKeyRef:
+        name: postgres-secret
+        key: postgresql-database
+  - name: LINE_CHANNEL_ACCESS_TOKEN
+    valueFrom:
+      secretKeyRef:
+        name: line-api-secret
+        key: line_channel_access_token
+  - name: LINE_CHANNEL_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: line-api-secret
+        key: line_channel_secret
+
+serviceAccount:
+  create: true
+  # name: "" # 必要に応じてカスタム名を指定
+  automount: true
+  # annotations: {} # 必要に応じてアノテーションを追加
+
+autoscaling:
+  enabled: false  # HPAを有効にする場合は true に変更
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80  # CPU使用率のターゲット
+  targetMemoryUtilizationPercentage: 70  # メモリ使用率のターゲット
+
+
