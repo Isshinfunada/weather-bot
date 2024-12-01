@@ -1,6 +1,4 @@
--- migrations/001_create_tables.sql
-
--- +migrate Up
+-- +goose Up
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     line_user_id VARCHAR(255) UNIQUE NOT NULL,
@@ -15,6 +13,6 @@ CREATE TABLE messages (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- +migrate Down
+-- +goose Down
 DROP TABLE messages;
 DROP TABLE users;
