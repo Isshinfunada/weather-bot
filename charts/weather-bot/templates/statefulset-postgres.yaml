@@ -38,15 +38,56 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.postgresql.existingSecret }}
                   key: postgresql-database
+            - name: DB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: db_url
+            # 他の環境変数も同様に設定
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "192Mi"
+              cpu: "150m"
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - exec pg_isready -U "postgres" -h 127.0.0.1 -p 5432
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 6
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - exec pg_isready -U "postgres" -h 127.0.0.1 -p 5432 && [ -f /opt/bitnami/postgresql/tmp/.initialized ] || [ -f /bitnami/postgresql/.initialized ]
+            initialDelaySeconds: 5
+            timeoutSeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 6
           volumeMounts:
             - name: postgres-storage
               mountPath: /var/lib/postgresql/data
+      nodeSelector:
+        # 必要に応じてノードセレクターを追加
+      tolerations:
+        # 必要に応じてトレランスを追加
+      affinity:
+        # 必要に応じてアフィニティを追加
   volumeClaimTemplates:
     - metadata:
         name: postgres-storage
       spec:
         accessModes: [ "ReadWriteOnce" ]
-        storageClassName: "{{ .Values.postgresql.storageClass }}"
+        storageClassName: {{ .Values.storageClass.name }}
         resources:
           requests:
-            storage: {{ .Values.postgresql.storageSize }}
+            storage: {{ .Values.postgresql.persistence.size }}
