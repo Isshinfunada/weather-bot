@@ -14,4 +14,5 @@ docker-down:
 
 # Kubernetes上でアプリケーションをデプロイ
 deploy: build
+	docker push isshinfunada/weather-bot:latest 
 	helm upgrade --install weather-bot ./charts/weather-bot -n weather-bot
