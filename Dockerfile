@@ -1,4 +1,4 @@
-# Dockerfile
+# ビルドステージ
 FROM golang:1.23-alpine AS builder
 
 WORKDIR /app
@@ -24,6 +24,9 @@ WORKDIR /root/
 
 # ビルドされたバイナリをコピー
 COPY --from=builder /app/weather-bot .
+
+# マイグレーションスクリプトをコピー
+COPY --from=builder /app/migrations ./migrations
 
 # アプリケーションのポートを公開
 EXPOSE 8080
