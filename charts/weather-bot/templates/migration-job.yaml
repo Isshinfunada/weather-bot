@@ -1,15 +1,16 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: "{{ include "weather-bot.fullname" . }}-migration"
+  name: "{{ include "weather-bot.fullname" . }}-migration-{{ .Release.Revision }}"
   labels:
     app.kubernetes.io/name: "{{ include "weather-bot.name" . }}"
     app.kubernetes.io/instance: "{{ .Release.Name }}"
     app.kubernetes.io/managed-by: "{{ .Release.Service }}"
   annotations:
     "helm.sh/hook": pre-install,pre-upgrade
-    "helm.sh/hook-delete-policy": hook-succeeded
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded,hook-failed
 spec:
+  ttlSecondsAfterFinished: 100
   template:
     metadata:
       labels:
@@ -19,7 +20,8 @@ spec:
       containers:
         - name: migration
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          command: ["./main"]
+          workingDir: /root/                  # 追加: 作業ディレクトリを設定
+          command: ["./weather-bot"]
           args: ["migrate"]
           env:
             - name: DB_URL
