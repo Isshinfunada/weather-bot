@@ -3,31 +3,30 @@ FROM golang:1.23-alpine AS builder
 
 WORKDIR /app
 
-# Go modulesの依存関係をキャッシュするためにgo.modとgo.sumをコピー
-COPY go.mod .
-COPY go.sum .
+# Goモジュールをコピーして依存関係をインストール
+COPY go.mod go.sum ./
 RUN go mod download
 
-# アプリケーションのソースコードをコピー
+# ソースコードをコピー
 COPY . .
-
-# マイグレーションファイルをコピー
-COPY migrations ./migrations
 
 # バイナリをビルド
 RUN go build -o weather-bot ./cmd/main.go
 
-# 実行用の軽量イメージにコピー
+# 実行ステージ
 FROM alpine:latest
-
-WORKDIR /root/
 
 # 必要なパッケージをインストール
 RUN apk add --no-cache ca-certificates
 
-# ビルドされたバイナリとマイグレーションファイルをコピー
+# 作業ディレクトリを設定
+WORKDIR /root/
+
+# ビルドされたバイナリをコピー
 COPY --from=builder /app/weather-bot .
-COPY --from=builder /app/migrations ./migrations
+
+# アプリケーションのポートを公開
+EXPOSE 8080
 
 # 実行
 CMD ["./weather-bot"]
