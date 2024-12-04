@@ -25,11 +25,14 @@ ingress:
 
 storageClass:
   create: false                       # 既存のStorageClassを使用
-  name: "local-path"                  # クラスターに存在するStorageClass名
+  name: "standard"                  # クラスターに存在するStorageClass名
   provisioner: ""
   reclaimPolicy: ""
   volumeBindingMode: ""
   parameters: {}
+
+migration:
+  backoffLimit: 4
 
 postgresql:
   replicaCount: 1
@@ -37,7 +40,7 @@ postgresql:
   image:
     repository: postgres
     tag: "16.4-alpine3.20"
-  storageClass: "local-path"
+  storageClass: "standard"
   storageSize: "8Gi"
 
 env:
