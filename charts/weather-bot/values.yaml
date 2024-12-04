@@ -31,7 +31,7 @@ storageClass:
   volumeBindingMode: ""
   parameters: {}
 
-migraion:
+migration:
   backoffLimit: 4
 
 postgresql:
