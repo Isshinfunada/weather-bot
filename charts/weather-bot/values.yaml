@@ -19,6 +19,8 @@ ingress:
   hosts:
     - host: paraponerainy.duckdns.org
       paths:
+        - path: /
+          pathType: Prefix
         - path: /webhook
           pathType: Prefix
   tls: []  # TLS設定が必要な場合はここに追加
