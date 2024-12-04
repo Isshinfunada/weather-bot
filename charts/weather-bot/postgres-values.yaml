@@ -14,15 +14,15 @@ postgresql:
     username: 
       valueFrom:
         secretKeyRef:
-          name: {{ .Values.global.postgresql.auth.existingSecret }}
+          name: {{ .Values.postgresql.existingSecret }}
           key: postgresql-username         # Secret に保存されたユーザー名のキー
     password: 
       valueFrom:
         secretKeyRef:
-          name: {{ .Values.global.postgresql.auth.existingSecret }}
+          name: {{ .Values.postgresql.existingSecret }}
           key: postgresql-password         # Secret に保存されたパスワードのキー
     database: 
       valueFrom:
         secretKeyRef:
-          name: {{ .Values.global.postgresql.auth.existingSecret }}
+          name: {{ .Values.postgresql.existingSecret }}
           key: postgresql-database         # Secret に保存されたデータベース名のキー

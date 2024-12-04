@@ -25,7 +25,7 @@ spec:
             - name: DB_URL
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.global.postgresql.auth.existingSecret }}
+                  name: {{ .Values.postgresql.existingSecret }}
                   key: db_url
             # 他の必要な環境変数をここに追加
       restartPolicy: Never
