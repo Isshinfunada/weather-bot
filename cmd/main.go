@@ -9,9 +9,14 @@ import (
 	"github.com/Isshinfunada/weather-bot/internal/interfaces/repository"
 	"github.com/labstack/echo/v4"
 	_ "github.com/lib/pq"
+	"github.com/pressly/goose"
 )
 
 func main() {
+	if len(os.Args) > 1 && os.Args[1] == "migrate" {
+		runMigrations()
+		return
+	}
 	// 通常のアプリケーション起動処理
 	runApp()
 }
@@ -72,4 +77,24 @@ func runApp() {
 	})
 
 	e.Logger.Fatal(e.Start(":8080"))
+}
+
+func runMigrations() {
+	dbURL := os.Getenv("DB_URL")
+	if dbURL == "" {
+		log.Fatal("DB_URL is not set")
+	}
+
+	db, err := sql.Open("postgres", dbURL)
+	if err != nil {
+		log.Fatalf("Failed to connect to database: %v", err)
+	}
+	defer db.Close()
+
+	err = goose.Up(db, "migrations")
+	if err != nil {
+		log.Fatalf("Failed to run migrations: %v", err)
+	}
+
+	log.Println("Migrations applied successfully.")
 }
