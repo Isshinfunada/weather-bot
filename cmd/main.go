@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -13,23 +14,31 @@ import (
 )
 
 func main() {
-	if len(os.Args) > 1 && os.Args[1] == "migrate" {
-		runMigrations()
-		return
+	if err := run(); err != nil {
+		// エラーが発生したらログ出力して終了コードを返す
+		log.Printf("[ERROR] %v\n", err)
+		os.Exit(1)
 	}
-	// 通常のアプリケーション起動処理
-	runApp()
 }
 
-func runApp() {
+func run() error {
+	// 引数で "migrate" が指定されたらマイグレーション
+	if len(os.Args) > 1 && os.Args[1] == "migrate" {
+		return runMigrations()
+	}
+	// 通常のアプリケーション起動処理
+	return runApp()
+}
+
+func runApp() error {
 	dbURL := os.Getenv("DB_URL")
 	if dbURL == "" {
-		log.Fatal("DB_URL is not set")
+		return fmt.Errorf("DB_URL is not set")
 	}
 
 	db, err := sql.Open("postgres", dbURL)
 	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
+		return fmt.Errorf("failed to connect to database: %w", err)
 	}
 	defer db.Close()
 
@@ -76,25 +85,28 @@ func runApp() {
 		return c.JSON(http.StatusOK, map[string]string{"message": "Webhook received"})
 	})
 
+	// Echoサーバーの起動
 	e.Logger.Fatal(e.Start(":8080"))
+	return nil
 }
 
-func runMigrations() {
+func runMigrations() error {
 	dbURL := os.Getenv("DB_URL")
 	if dbURL == "" {
-		log.Fatal("DB_URL is not set")
+		return fmt.Errorf("DB_URL is not set")
 	}
 
 	db, err := sql.Open("postgres", dbURL)
 	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
+		return fmt.Errorf("failed to connect to database: %w", err)
 	}
 	defer db.Close()
 
 	err = goose.Up(db, "migrations")
 	if err != nil {
-		log.Fatalf("Failed to run migrations: %v", err)
+		return fmt.Errorf("failed to run migrations: %w", err)
 	}
 
 	log.Println("Migrations applied successfully.")
+	return nil
 }
