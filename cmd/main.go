@@ -102,7 +102,7 @@ func runMigrations() error {
 	}
 	defer db.Close()
 
-	err = goose.Up(db, "migrations")
+	err = goose.Up(db, "db")
 	if err != nil {
 		return fmt.Errorf("failed to run migrations: %w", err)
 	}

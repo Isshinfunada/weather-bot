@@ -26,7 +26,7 @@ WORKDIR /root/
 COPY --from=builder /app/weather-bot .
 
 # マイグレーションスクリプトをコピー
-COPY --from=builder /app/migrations ./migrations
+COPY --from=builder /app/db ./db
 
 # アプリケーションのポートを公開
 EXPOSE 8080
