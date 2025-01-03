@@ -22,10 +22,15 @@ func main() {
 }
 
 func run() error {
-	// 引数で "migrate" が指定されたらマイグレーション
-	if len(os.Args) > 1 && os.Args[1] == "migrate" {
-		return runMigrations()
+	if len(os.Args) > 1 {
+		switch os.Args[1] {
+		case "migrate":
+			return runMigrations()
+		case "seed":
+			return runSeedsMigrations()
+		}
 	}
+
 	// 通常のアプリケーション起動処理
 	return runApp()
 }
@@ -102,11 +107,36 @@ func runMigrations() error {
 	}
 	defer db.Close()
 
-	err = goose.Up(db, "migrations")
+	err = goose.Up(db, "db/migrations")
 	if err != nil {
 		return fmt.Errorf("failed to run migrations: %w", err)
 	}
 
 	log.Println("Migrations applied successfully.")
+	return nil
+}
+
+func runSeedsMigrations() error {
+	dbURL := os.Getenv("DB_URL")
+	if dbURL == "" {
+		return fmt.Errorf("DB_URL is not set")
+	}
+
+	db, err := sql.Open("postgres", dbURL)
+	if err != nil {
+		return fmt.Errorf("failed to connect to database: %w", err)
+	}
+	defer db.Close()
+
+	// seeds 用のバージョン管理テーブルに切り替える
+	goose.SetTableName("schema_seeds")
+
+	// db/seeds配下のSQLファイルをgooseで適用
+	err = goose.Up(db, "db/seeds")
+	if err != nil {
+		return fmt.Errorf("failed to run seeds migrations: %w", err)
+	}
+
+	log.Println("Seeds applied successfully.")
 	return nil
 }
