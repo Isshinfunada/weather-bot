@@ -22,13 +22,13 @@ func main() {
 }
 
 func run() error {
-	// 引数で "migrate" が指定されたらマイグレーション
-	if len(os.Args) > 1 && os.Args[1] == "migrate" {
-		return runMigrations()
-	}
-
-	if len(os.Args) > 1 && os.Args[1] == "seeds" {
-		return runSeedsMigrations()
+	if len(os.Args) > 1 {
+		switch os.Args[1] {
+		case "migrate":
+			return runMigrations()
+		case "seed":
+			return runSeedsMigrations()
+		}
 	}
 
 	// 通常のアプリケーション起動処理
@@ -127,6 +127,9 @@ func runSeedsMigrations() error {
 		return fmt.Errorf("failed to connect to database: %w", err)
 	}
 	defer db.Close()
+
+	// seeds 用のバージョン管理テーブルに切り替える
+	goose.SetTableName("schema_seeds")
 
 	// db/seeds配下のSQLファイルをgooseで適用
 	err = goose.Up(db, "db/seeds")

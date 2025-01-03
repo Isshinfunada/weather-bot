@@ -1,13 +1,6 @@
 -- +goose Up
 
 -- Migration for area_centers
-CREATE TABLE IF NOT EXISTS area_centers (
-    id VARCHAR(10) PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    en_name VARCHAR(255) NOT NULL,
-    office_name VARCHAR(255) NOT NULL
-);
-
 INSERT INTO area_centers (id, name, en_name, office_name) VALUES ('010100', '北海道地方', 'Hokkaido', '札幌管区気象台');
 INSERT INTO area_centers (id, name, en_name, office_name) VALUES ('010200', '東北地方', 'Tohoku', '仙台管区気象台');
 INSERT INTO area_centers (id, name, en_name, office_name) VALUES ('010300', '関東甲信地方', 'Kanto Koshin', '気象庁');
@@ -21,12 +14,6 @@ INSERT INTO area_centers (id, name, en_name, office_name) VALUES ('011000', '九
 INSERT INTO area_centers (id, name, en_name, office_name) VALUES ('011100', '沖縄地方', 'Okinawa', '沖縄気象台');
 
 -- Migration for area_offices
-CREATE TABLE IF NOT EXISTS area_offices (
-    id VARCHAR(10) PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    en_name VARCHAR(255) NOT NULL,
-    parent_id VARCHAR(10) REFERENCES area_centers(id)
-);
 
 INSERT INTO area_offices (id, name, en_name, parent_id) VALUES ('011000', '宗谷地方', 'Soya', '010100');
 INSERT INTO area_offices (id, name, en_name, parent_id) VALUES ('012000', '上川・留萌地方', 'Kamikawa Rumoi', '010100');
@@ -88,12 +75,6 @@ INSERT INTO area_offices (id, name, en_name, parent_id) VALUES ('473000', '宮�
 INSERT INTO area_offices (id, name, en_name, parent_id) VALUES ('474000', '八重山地方', 'Yaeyama', '011100');
 
 -- Migration for area_class10
-CREATE TABLE IF NOT EXISTS area_class10 (
-    id VARCHAR(10) PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    en_name VARCHAR(255) NOT NULL,
-    parent_id VARCHAR(10) REFERENCES area_offices(id)
-);
 
 INSERT INTO area_class10 (id, name, en_name, parent_id) VALUES ('011000', '宗谷地方', 'Soya Region', '011000');
 INSERT INTO area_class10 (id, name, en_name, parent_id) VALUES ('012010', '上川地方', 'Kamikawa Region', '012000');
@@ -239,12 +220,6 @@ INSERT INTO area_class10 (id, name, en_name, parent_id) VALUES ('474010', '石�
 INSERT INTO area_class10 (id, name, en_name, parent_id) VALUES ('474020', '与那国島地方', 'Yonagunijima Region', '474000');
 
 -- Migration for area_class15
-CREATE TABLE IF NOT EXISTS area_class15 (
-    id VARCHAR(10) PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    en_name VARCHAR(255) NOT NULL,
-    parent_id VARCHAR(10) REFERENCES area_class10(id)
-);
 
 INSERT INTO area_class15 (id, name, en_name, parent_id) VALUES ('011011', '宗谷北部', 'Northern Soya', '011000');
 INSERT INTO area_class15 (id, name, en_name, parent_id) VALUES ('011012', '宗谷南部', 'Southern Soya', '011000');
@@ -623,12 +598,6 @@ INSERT INTO area_class15 (id, name, en_name, parent_id) VALUES ('474012', '竹�
 INSERT INTO area_class15 (id, name, en_name, parent_id) VALUES ('474020', '与那国島地方', 'Yonagunijima Region', '474020');
 
 -- Migration for area_class20
-CREATE TABLE IF NOT EXISTS area_class20 (
-    id VARCHAR(10) PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    en_name VARCHAR(255) NOT NULL,
-    parent_id VARCHAR(10) REFERENCES area_class15(id)
-);
 
 INSERT INTO area_class20 (id, name, en_name, parent_id) VALUES ('0110000', '札幌市', 'Sapporo City', '016012');
 INSERT INTO area_class20 (id, name, en_name, parent_id) VALUES ('0120200', '函館市', 'Hakodate City', '017012');
@@ -2417,11 +2386,3 @@ INSERT INTO area_class20 (id, name, en_name, parent_id) VALUES ('4736200', '八�
 INSERT INTO area_class20 (id, name, en_name, parent_id) VALUES ('4737500', '多良間村', 'Tarama Village', '473002');
 INSERT INTO area_class20 (id, name, en_name, parent_id) VALUES ('4738100', '竹富町', 'Taketomi Town', '474012');
 INSERT INTO area_class20 (id, name, en_name, parent_id) VALUES ('4738200', '与那国町', 'Yonaguni Town', '474020');
-
--- +goose Down
-
-DROP TABLE IF EXISTS area_class20;
-DROP TABLE IF EXISTS area_class15;
-DROP TABLE IF EXISTS area_class10;
-DROP TABLE IF EXISTS area_offices;
-DROP TABLE IF EXISTS area_centers;
