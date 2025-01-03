@@ -213,36 +213,10 @@ LINEアカウント情報を利用してユーザー認証を行い、個別の�
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     line_user_id VARCHAR(255) UNIQUE NOT NULL,
-    access_token VARCHAR(255) NOT NULL,
-    selected_city_id VARCHAR(50) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE cities (
-    id VARCHAR(50) PRIMARY KEY, -- location_id
-    name VARCHAR(255) NOT NULL,
-    region VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE notification_settings (
-    id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id),
+    selected_city_id VARCHAR(10) REFERENCES area_class20(id),
     notify_time TIME NOT NULL,
-    notify_format VARCHAR(50), -- 例: summary, detailed
-    timezone VARCHAR(50) NOT NULL DEFAULT 'Asia/Tokyo',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE notification_history (
-    id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id),
-    notification_time TIMESTAMP NOT NULL,
-    weather_data JSONB,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 ```
 
