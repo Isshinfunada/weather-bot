@@ -2,7 +2,7 @@
 
 -- Migration for area_centers
 CREATE TABLE IF NOT EXISTS area_centers (
-    id VARCHAR(6) PRIMARY KEY,
+    id VARCHAR(10) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     en_name VARCHAR(255) NOT NULL,
     office_name VARCHAR(255) NOT NULL
@@ -22,10 +22,10 @@ INSERT INTO area_centers (id, name, en_name, office_name) VALUES ('011100', '沖
 
 -- Migration for area_offices
 CREATE TABLE IF NOT EXISTS area_offices (
-    id VARCHAR(6) PRIMARY KEY,
+    id VARCHAR(10) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     en_name VARCHAR(255) NOT NULL,
-    parent_id VARCHAR(6) REFERENCES area_centers(id)
+    parent_id VARCHAR(10) REFERENCES area_centers(id)
 );
 
 INSERT INTO area_offices (id, name, en_name, parent_id) VALUES ('011000', '宗谷地方', 'Soya', '010100');
@@ -89,10 +89,10 @@ INSERT INTO area_offices (id, name, en_name, parent_id) VALUES ('474000', '八�
 
 -- Migration for area_class10
 CREATE TABLE IF NOT EXISTS area_class10 (
-    id VARCHAR(6) PRIMARY KEY,
+    id VARCHAR(10) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     en_name VARCHAR(255) NOT NULL,
-    parent_id VARCHAR(6) REFERENCES area_offices(id)
+    parent_id VARCHAR(10) REFERENCES area_offices(id)
 );
 
 INSERT INTO area_class10 (id, name, en_name, parent_id) VALUES ('011000', '宗谷地方', 'Soya Region', '011000');
@@ -240,10 +240,10 @@ INSERT INTO area_class10 (id, name, en_name, parent_id) VALUES ('474020', '与�
 
 -- Migration for area_class15
 CREATE TABLE IF NOT EXISTS area_class15 (
-    id VARCHAR(6) PRIMARY KEY,
+    id VARCHAR(10) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     en_name VARCHAR(255) NOT NULL,
-    parent_id VARCHAR(6) REFERENCES area_class10(id)
+    parent_id VARCHAR(10) REFERENCES area_class10(id)
 );
 
 INSERT INTO area_class15 (id, name, en_name, parent_id) VALUES ('011011', '宗谷北部', 'Northern Soya', '011000');
@@ -624,10 +624,10 @@ INSERT INTO area_class15 (id, name, en_name, parent_id) VALUES ('474020', '与�
 
 -- Migration for area_class20
 CREATE TABLE IF NOT EXISTS area_class20 (
-    id VARCHAR(6) PRIMARY KEY,
+    id VARCHAR(10) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     en_name VARCHAR(255) NOT NULL,
-    parent_id VARCHAR(6) REFERENCES area_class15(id)
+    parent_id VARCHAR(10) REFERENCES area_class15(id)
 );
 
 INSERT INTO area_class20 (id, name, en_name, parent_id) VALUES ('0110000', '札幌市', 'Sapporo City', '016012');
