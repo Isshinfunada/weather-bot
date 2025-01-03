@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: "{{ include "weather-bot.fullname" . }}-migration-{{ .Release.Revision }}"
+  name: "{{ include "weather-bot.fullname" . }}-seed-{{ .Release.Revision }}"
   labels:
     app.kubernetes.io/name: "{{ include "weather-bot.name" . }}"
     app.kubernetes.io/instance: "{{ .Release.Name }}"
@@ -18,11 +18,11 @@ spec:
         app.kubernetes.io/instance: "{{ .Release.Name }}"
     spec:
       containers:
-        - name: migration
+        - name: seed
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           workingDir: /root/
           command: ["./weather-bot"]
-          args: ["migrate"]
+          args: ["seed"]
           env:
             - name: DB_URL
               valueFrom:
