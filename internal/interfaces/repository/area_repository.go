@@ -58,7 +58,7 @@ func (r *areaRepository) FindHierarchyByClass20ID(ctx context.Context, class20ID
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
-		return nil, fmt.Errorf("query wrror: %w", err)
+		return nil, fmt.Errorf("query error: %w", err)
 	}
 
 	return &entity.HierarchyArea{
