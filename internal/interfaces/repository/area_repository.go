@@ -36,7 +36,7 @@ func (r *areaRepository) FindHierarchyByClass20ID(ctx context.Context, class20ID
         JOIN area_class10 c10 ON c15.parent_id = c10.id
         JOIN area_offices o ON c10.parent_id = o.id
         JOIN area_centers ct ON o.parent_id = ct.id
-        WHERE c20.id = ?
+        WHERE c20.id = $1
 	`
 	row := r.db.QueryRowContext(ctx, query, class20ID)
 
