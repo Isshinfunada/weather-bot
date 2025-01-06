@@ -13,6 +13,7 @@ type UserRepository interface {
 	CreateUser(ctx context.Context, user *entity.User) (*entity.User, error)
 	FindUserByID(ctx context.Context, userID int) (*entity.User, error)
 	UpdateUser(ctx context.Context, user *entity.User) error
+	DeleteUser(ctx context.Context, userID int) error
 }
 
 type userRepository struct {
@@ -118,5 +119,21 @@ func (r *userRepository) UpdateUser(ctx context.Context, user *entity.User) erro
 	if rowsAffected == 0 {
 		return fmt.Errorf("no rows updated (id=%d not found)", user.ID)
 	}
+	return nil
+}
+
+func (r *userRepository) DeleteUser(ctx context.Context, userID int) error {
+	query := `DELETE FROM users WHERE id = $1`
+
+	result, err := r.db.ExecContext(ctx, query, userID)
+	if err != nil {
+		return fmt.Errorf("failed to delete user: %w", err)
+	}
+
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected == 0 {
+		return fmt.Errorf("no rows deleted (id=%d not found)", userID)
+	}
+
 	return nil
 }
