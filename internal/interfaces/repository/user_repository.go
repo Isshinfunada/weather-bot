@@ -12,6 +12,7 @@ import (
 type UserRepository interface {
 	CreateUser(ctx context.Context, user *entity.User) (*entity.User, error)
 	FindUserByID(ctx context.Context, userID int) (*entity.User, error)
+	UpdateUser(ctx context.Context, user *entity.User) error
 }
 
 type userRepository struct {
@@ -85,4 +86,37 @@ func (r *userRepository) FindUserByID(ctx context.Context, userID int) (*entity.
 	}
 
 	return &u, nil
+}
+
+func (r *userRepository) UpdateUser(ctx context.Context, user *entity.User) error {
+	query := `
+		UPDATE users
+		SET
+			selected_area_id = $1,
+			notify_time = $2,
+			is_active = $3,
+			updated_at = $4,
+		WHERE id = $5
+	`
+
+	user.UpdatedAt = time.Now()
+
+	result, err := r.db.ExecContext(
+		ctx,
+		query,
+		user.SelectedAreaID,
+		user.NotifyTime,
+		user.IsActive,
+		user.UpdatedAt,
+		user.ID,
+	)
+	if err != nil {
+		return fmt.Errorf("failed to update user: %w", err)
+	}
+
+	rowsAffected, _ := result.RowsAffected()
+	if rowsAffected == 0 {
+		return fmt.Errorf("no rows updated (id=%d not found)", user.ID)
+	}
+	return nil
 }
