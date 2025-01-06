@@ -11,6 +11,7 @@ import (
 type UserUsecase interface {
 	Create(ctx context.Context, user *entity.User) (*entity.User, error)
 	GetByID(ctx context.Context, userID int) (*entity.User, error)
+	GetByLINEID(ctx context.Context, LINEUserID string) (*entity.User, error)
 }
 
 type userUsecase struct {
@@ -46,6 +47,21 @@ func (u *userUsecase) GetByID(ctx context.Context, userID int) (*entity.User, er
 	}
 	if user == nil {
 		return nil, fmt.Errorf("user not found (id=%d)", userID)
+	}
+	return user, nil
+}
+
+// LINEUserIDで探す
+func (u *userUsecase) GetByLINEID(ctx context.Context, LINEUserID string) (*entity.User, error) {
+	if LINEUserID == "" {
+		return nil, fmt.Errorf("LINEUserID is required")
+	}
+	user, err := u.userRepo.FindUserByLINEUserID(ctx, LINEUserID)
+	if err != nil {
+		return nil, err
+	}
+	if user == nil {
+		return nil, fmt.Errorf("user not found (LINEUserID=%s)", LINEUserID)
 	}
 	return user, nil
 }
