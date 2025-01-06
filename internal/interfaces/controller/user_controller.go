@@ -63,3 +63,20 @@ func (ctrl *UserController) Create(c echo.Context) error {
 	}
 	return c.JSON(http.StatusCreated, created)
 }
+
+// GET /api/users/:id
+func (ctrl *UserController) GetByID(c echo.Context) error {
+	idParam := c.Param("id")
+	userID, err := strconv.Atoi(idParam)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid user id"})
+	}
+
+	ctx := c.Request().Context()
+	user, err := ctrl.userUC.GetByID(ctx, userID)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, user)
+}
