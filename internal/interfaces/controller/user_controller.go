@@ -75,7 +75,23 @@ func (ctrl *UserController) GetByID(c echo.Context) error {
 	ctx := c.Request().Context()
 	user, err := ctrl.userUC.GetByID(ctx, userID)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, user)
+}
+
+// GET /api/users/line/:lineUserid
+func (ctrl *UserController) GetByLINEUserID(c echo.Context) error {
+	lineUserId := c.Param("lineUserid")
+	if lineUserId == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "lineUserId is required "})
+	}
+
+	ctx := c.Request().Context()
+	user, err := ctrl.userUC.GetByLINEID(ctx, lineUserId)
+	if err != nil {
+		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
 
 	return c.JSON(http.StatusOK, user)
