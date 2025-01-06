@@ -79,3 +79,14 @@ func (u *userUsecase) Update(ctx context.Context, user *entity.User) error {
 	}
 	return nil
 }
+
+// ユーザー削除
+func (u *userUsecase) Delete(ctx context.Context, userID int) error {
+	if userID <= 0 {
+		return fmt.Errorf("invalid user id")
+	}
+	if err := u.userRepo.DeleteUser(ctx, userID); err != nil {
+		return err
+	}
+	return nil
+}
