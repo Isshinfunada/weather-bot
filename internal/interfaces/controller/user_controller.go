@@ -133,3 +133,18 @@ func (ctrl *UserController) Update(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, map[string]string{"message": "user updated"})
 }
+
+// DELETE /api/users/:id
+func (ctrl *UserController) Delete(c echo.Context) error {
+	idParam := c.Param("id")
+	userID, err := strconv.Atoi(idParam)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid user id"})
+	}
+
+	ctx := c.Request().Context()
+	if err := ctrl.userUC.Delete(ctx, userID); err != nil {
+		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
+	}
+	return c.JSON(http.StatusOK, map[string]string{"message": "user deleted"})
+}

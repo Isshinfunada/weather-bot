@@ -13,6 +13,7 @@ type UserUsecase interface {
 	GetByID(ctx context.Context, userID int) (*entity.User, error)
 	GetByLINEID(ctx context.Context, LINEUserID string) (*entity.User, error)
 	Update(ctx context.Context, user *entity.User) error
+	Delete(ctx context.Context, userID int) error
 }
 
 type userUsecase struct {
