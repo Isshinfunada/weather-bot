@@ -7,6 +7,9 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/Isshinfunada/weather-bot/internal/interfaces/controller"
+	"github.com/Isshinfunada/weather-bot/internal/interfaces/repository"
+	"github.com/Isshinfunada/weather-bot/internal/usecase"
 	"github.com/labstack/echo/v4"
 	_ "github.com/lib/pq"
 	"github.com/pressly/goose"
@@ -46,6 +49,12 @@ func runApp() error {
 	}
 	defer db.Close()
 
+	userRepo := repository.NewUserRepository(db)
+	userUC := usecase.NewUserUseCase(userRepo)
+
+	areaRepo := repository.NewAreaRepository(db)
+	areaUC := usecase.NewAreaUseCase(areaRepo)
+
 	// Echoサーバーの設定
 	e := echo.New()
 
@@ -53,6 +62,8 @@ func runApp() error {
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
+
+	controller.RegisterRoutes(e, userUC, areaUC)
 
 	// Echoサーバーの起動
 	e.Logger.Fatal(e.Start(":8080"))
