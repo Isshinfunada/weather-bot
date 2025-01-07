@@ -17,7 +17,6 @@ func NewAreaController(aUC usecase.AreaUseCase) *AreaController {
 
 func (ctrl *AreaController) GetHierarchy(c echo.Context) error {
 	class20ID := c.Param("class20_id")
-
 	ctx := c.Request().Context()
 	hierarchy, err := ctrl.areaUC.GetHierarchy(ctx, class20ID)
 	if err != nil {
