@@ -19,7 +19,7 @@ func NewAreaController(aUC usecase.AreaUseCase) *AreaController {
 func (ctrl *AreaController) GetHierarchy(c echo.Context) error {
 	class20ID, err := strconv.Atoi(c.Param("class20_id"))
 	if err != nil || class20ID == 0 {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "class20__id is requiredand must be a valid integer"})
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "class20_id is requiredand must be a valid integer"})
 	}
 
 	ctx := c.Request().Context()

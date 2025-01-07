@@ -129,7 +129,7 @@ func (r *userRepository) UpdateUser(ctx context.Context, user *entity.User) erro
 			selected_area_id = $1,
 			notify_time = $2,
 			is_active = $3,
-			updated_at = $4,
+			updated_at = $4
 		WHERE id = $5
 	`
 
