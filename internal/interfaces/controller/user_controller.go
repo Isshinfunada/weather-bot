@@ -96,3 +96,40 @@ func (ctrl *UserController) GetByLINEUserID(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, user)
 }
+
+// PUT /api/users/:id
+func (ctrl *UserController) Update(c echo.Context) error {
+	idParam := c.Param("id")
+	userID, err := strconv.Atoi(idParam)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid user id"})
+	}
+
+	var req UpdateUserRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid request body"})
+	}
+
+	notifyTime, err := time.Parse("15:04", req.NotifyTime)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid notify time"})
+	}
+
+	selectedAreaID, err := strconv.Atoi(req.SelectedAreaID)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid selectedArea ID"})
+	}
+
+	user := &entity.User{
+		ID:             userID,
+		SelectedAreaID: selectedAreaID,
+		IsActive:       req.IsActive,
+		NotifyTime:     notifyTime,
+	}
+
+	ctx := c.Request().Context()
+	if err := ctrl.userUC.Update(ctx, user); err != nil {
+		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
+	}
+	return c.JSON(http.StatusOK, map[string]string{"message": "user updated"})
+}
