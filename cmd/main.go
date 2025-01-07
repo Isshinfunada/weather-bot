@@ -7,7 +7,9 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/Isshinfunada/weather-bot/internal/interfaces/controller"
 	"github.com/Isshinfunada/weather-bot/internal/interfaces/repository"
+	"github.com/Isshinfunada/weather-bot/internal/usecase"
 	"github.com/labstack/echo/v4"
 	_ "github.com/lib/pq"
 	"github.com/pressly/goose"
@@ -47,8 +49,11 @@ func runApp() error {
 	}
 	defer db.Close()
 
-	// リポジトリの初期化
 	userRepo := repository.NewUserRepository(db)
+	userUC := usecase.NewUserUseCase(userRepo)
+
+	areaRepo := repository.NewAreaRepository(db)
+	areaUC := usecase.NewAreaUseCase(areaRepo)
 
 	// Echoサーバーの設定
 	e := echo.New()
@@ -58,37 +63,7 @@ func runApp() error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
 
-	// ユーザー登録エンドポイント
-	e.POST("/register", func(c echo.Context) error {
-		type RegisterRequest struct {
-			LineUserID string `json:"line_user_id"`
-		}
-
-		var req RegisterRequest
-		if err := c.Bind(&req); err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
-		}
-
-		if req.LineUserID == "" {
-			return c.JSON(http.StatusBadRequest, map[string]string{"error": "line_user_id is required"})
-		}
-
-		user, err := userRepo.CreateUser(req.LineUserID)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to create user"})
-		}
-
-		return c.JSON(http.StatusOK, map[string]interface{}{
-			"id":           user.ID,
-			"line_user_id": user.LineUserID,
-		})
-	})
-
-	// Webhook エンドポイントの追加（今後の実装用）
-	e.POST("/webhook", func(c echo.Context) error {
-		// Webhook 処理ロジックをここに実装
-		return c.JSON(http.StatusOK, map[string]string{"message": "Webhook received"})
-	})
+	controller.RegisterRoutes(e, userUC, areaUC)
 
 	// Echoサーバーの起動
 	e.Logger.Fatal(e.Start(":8080"))
