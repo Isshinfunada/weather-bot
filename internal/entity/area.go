@@ -1,38 +1,38 @@
 package entity
 
 type AreaCenter struct {
-	ID         int
+	ID         string
 	Name       string
 	EnName     string
 	OfficeName string
 }
 
 type AreaOffice struct {
-	ID       int
+	ID       string
 	Name     string
 	EnName   string
-	ParentID int // area_centers.id
+	ParentID string // area_centers.id
 }
 
 type AreaClass10 struct {
-	ID       int
+	ID       string
 	Name     string
 	EnName   string
-	ParentID int // area_offices.id
+	ParentID string // area_offices.id
 }
 
 type AreaClass15 struct {
-	ID       int
+	ID       string
 	Name     string
 	EnName   string
-	ParentID int // area_class10.id
+	ParentID string // area_class10.id
 }
 
 type AreaClass20 struct {
-	ID       int
+	ID       string
 	Name     string
 	EnName   string
-	ParentID int // area_class15.id
+	ParentID string // area_class15.id
 }
 
 // 階層をまとめて表現するための複合エンティティ

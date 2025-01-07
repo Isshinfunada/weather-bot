@@ -10,7 +10,7 @@ import (
 
 // インターフェース
 type AreaRepository interface {
-	FindHierarchyByClass20ID(ctx context.Context, class20ID int) (*entity.HierarchyArea, error)
+	FindHierarchyByClass20ID(ctx context.Context, class20ID string) (*entity.HierarchyArea, error)
 }
 
 // 実装構造体
@@ -23,7 +23,7 @@ func NewAreaRepository(db *sql.DB) AreaRepository {
 	return &areaRepository{db: db}
 }
 
-func (r *areaRepository) FindHierarchyByClass20ID(ctx context.Context, class20ID int) (*entity.HierarchyArea, error) {
+func (r *areaRepository) FindHierarchyByClass20ID(ctx context.Context, class20ID string) (*entity.HierarchyArea, error) {
 	query := `
         SELECT
             c20.id, c20.name, c20.en_name, c20.parent_id,

@@ -9,7 +9,7 @@ import (
 )
 
 type AreaUseCase interface {
-	GetHierarchy(ctx context.Context, class20ID int) (*entity.HierarchyArea, error)
+	GetHierarchy(ctx context.Context, class20ID string) (*entity.HierarchyArea, error)
 }
 
 type areaUseCase struct {
@@ -20,10 +20,11 @@ func NewAreaUseCase(aRepo repository.AreaRepository) AreaUseCase {
 	return &areaUseCase{areaRepo: aRepo}
 }
 
-func (u *areaUseCase) GetHierarchy(ctx context.Context, class20ID int) (*entity.HierarchyArea, error) {
-	// バリデーション
-	if len(fmt.Sprintf("%d", class20ID)) != 7 {
-		return nil, fmt.Errorf("id length is invalid")
+func (u *areaUseCase) GetHierarchy(ctx context.Context, class20ID string) (*entity.HierarchyArea, error) {
+	const CLASS20_LENGTH = 7
+
+	if err := validateClass20ID(class20ID, CLASS20_LENGTH); err != nil {
+		return nil, err
 	}
 
 	hierarchy, err := u.areaRepo.FindHierarchyByClass20ID(ctx, class20ID)
@@ -31,9 +32,15 @@ func (u *areaUseCase) GetHierarchy(ctx context.Context, class20ID int) (*entity.
 		return nil, err
 	}
 	if hierarchy == nil {
-		return nil, fmt.Errorf("not found for class20 id=%d", class20ID)
+		return nil, fmt.Errorf("not found for class20 id=%s", class20ID)
 	}
 
-	// ここに通知ロジックや他レポジトリとの連携処理を追記できる
 	return hierarchy, nil
+}
+
+func validateClass20ID(class20ID string, length int) error {
+	if len(class20ID) != length {
+		return fmt.Errorf("id length is invalid")
+	}
+	return nil
 }
