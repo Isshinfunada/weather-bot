@@ -63,7 +63,7 @@ func TestUserUsecase_Create_Success(t *testing.T) {
 
 	user := &entity.User{
 		LINEUserID:     "U123",
-		SelectedAreaID: 1,
+		SelectedAreaID: "1",
 		NotifyTime:     time.Date(now.Year(), now.Month(), now.Day(), 9, 0, 0, 0, time.UTC),
 	}
 
@@ -82,7 +82,7 @@ func TestUserUsecase_Create_InvalidLINEUserID(t *testing.T) {
 
 	user := &entity.User{
 		LINEUserID:     "",
-		SelectedAreaID: 1,
+		SelectedAreaID: "1",
 		NotifyTime:     time.Now(),
 	}
 
@@ -99,7 +99,7 @@ func TestUserUsecase_GetByID_Success(t *testing.T) {
 	expectedUser := &entity.User{
 		ID:             1,
 		LINEUserID:     "U123",
-		SelectedAreaID: 1,
+		SelectedAreaID: "1",
 		NotifyTime:     time.Now(),
 		IsActive:       true,
 	}
@@ -129,7 +129,7 @@ func TestUserUsecase_GetByLINEID_Success(t *testing.T) {
 	expectedUser := &entity.User{
 		ID:             2,
 		LINEUserID:     "U456",
-		SelectedAreaID: 2,
+		SelectedAreaID: "2",
 		NotifyTime:     time.Now(),
 		IsActive:       true,
 	}
@@ -158,7 +158,7 @@ func TestUserUsecase_Update_Success(t *testing.T) {
 
 	user := &entity.User{
 		ID:             1,
-		SelectedAreaID: 3,
+		SelectedAreaID: "3",
 		NotifyTime:     time.Now(),
 		IsActive:       false,
 	}
@@ -176,7 +176,7 @@ func TestUserUsecase_Update_InvalidID(t *testing.T) {
 
 	user := &entity.User{
 		ID:             0,
-		SelectedAreaID: 3,
+		SelectedAreaID: "3",
 		NotifyTime:     time.Now(),
 		IsActive:       false,
 	}
