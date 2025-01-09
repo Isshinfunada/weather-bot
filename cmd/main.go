@@ -50,10 +50,13 @@ func runApp() error {
 	defer db.Close()
 
 	userRepo := repository.NewUserRepository(db)
-	userUC := usecase.NewUserUseCase(userRepo)
-
 	areaRepo := repository.NewAreaRepository(db)
+	weatherRuleRepo := repository.NewWeatherRuleRepository(db)
+	notificationRepo := repository.NewNotificationRepository(db)
+
 	areaUC := usecase.NewAreaUseCase(areaRepo)
+	userUC := usecase.NewUserUseCase(userRepo)
+	weatherUC := usecase.NewWeatherUsecase(weatherRuleRepo, notificationRepo, userRepo, areaUC)
 
 	// Echoサーバーの設定
 	e := echo.New()
@@ -63,7 +66,7 @@ func runApp() error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
 
-	controller.RegisterRoutes(e, userUC, areaUC)
+	controller.RegisterRoutes(e, userUC, areaUC, weatherUC)
 
 	// Echoサーバーの起動
 	e.Logger.Fatal(e.Start(":8080"))
