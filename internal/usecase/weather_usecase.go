@@ -140,3 +140,19 @@ func (u *weatherUsecase) ProcessWeatherForUser(ctx context.Context, user *entity
 
 	return nil
 }
+
+func (u *weatherUsecase) ProcessWeatherForUsersInTimeRange(ctx context.Context, start, end time.Time) error {
+	// 指定時間帯のユーザーを取得
+	users, err := u.userRepo.FindUserByNotifyTimeRange(ctx, start, end)
+	if err != nil {
+		return fmt.Errorf("failed to find users by notify time range: %w", err)
+	}
+
+	// 各ユーザーに対して天気情報処理実行
+	for _, user := range users {
+		if err := u.ProcessWeatherForUser(ctx, user); err != nil {
+			fmt.Printf("Error processing weather for user %d: %v\n", user.ID, err)
+		}
+	}
+	return nil
+}
