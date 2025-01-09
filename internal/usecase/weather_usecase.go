@@ -14,6 +14,7 @@ import (
 
 type WeatherUsecase interface {
 	ProcessWeatherForUser(ctx context.Context, user *entity.User) error
+	ProcessWeatherForUsersInTimeRange(ctx context.Context, start, end time.Time) error
 }
 
 type weatherUsecase struct {
