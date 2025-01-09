@@ -82,7 +82,7 @@ func TestUserController_Create_Success(t *testing.T) {
 	expectedUser := &entity.User{
 		ID:             1,
 		LINEUserID:     "U123",
-		SelectedAreaID: 1,
+		SelectedAreaID: "1",
 		NotifyTime:     time.Date(now.Year(), now.Month(), now.Day(), 9, 0, 0, 0, time.UTC),
 		IsActive:       false,
 	}
@@ -116,7 +116,7 @@ func TestUserController_GetByID_Success(t *testing.T) {
 	expectedUser := &entity.User{
 		ID:             1,
 		LINEUserID:     "U123",
-		SelectedAreaID: 1,
+		SelectedAreaID: "1",
 		NotifyTime:     time.Now(),
 		IsActive:       true,
 	}
@@ -149,7 +149,7 @@ func TestUserController_GetByLINEUserID_Success(t *testing.T) {
 	expectedUser := &entity.User{
 		ID:             2,
 		LINEUserID:     "U123",
-		SelectedAreaID: 2,
+		SelectedAreaID: "2",
 		NotifyTime:     time.Now(),
 		IsActive:       true,
 	}

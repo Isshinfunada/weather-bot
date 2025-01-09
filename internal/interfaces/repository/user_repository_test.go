@@ -32,7 +32,7 @@ func TestCreateUser_Succeess(t *testing.T) {
 	now := time.Now()
 	user := &entity.User{
 		LINEUserID:     "U123",
-		SelectedAreaID: 0110000,
+		SelectedAreaID: "0110000",
 		NotifyTime:     time.Date(now.Year(), now.Month(), now.Day(), 9, 0, 0, 0, time.Local),
 		IsActive:       true,
 	}
@@ -58,7 +58,7 @@ func TestCreateUser_QueryError(t *testing.T) {
 	ctx := context.Background()
 	user := &entity.User{
 		LINEUserID:     "U123",
-		SelectedAreaID: 0110000,
+		SelectedAreaID: "0110000",
 		NotifyTime:     time.Now(),
 		IsActive:       true,
 	}
@@ -181,7 +181,7 @@ func TestUpdateUser_Success(t *testing.T) {
 	ctx := context.Background()
 	user := &entity.User{
 		ID:             1,
-		SelectedAreaID: 0120200,
+		SelectedAreaID: "0120200",
 		NotifyTime:     time.Date(0, 1, 1, 10, 0, 0, 0, time.UTC),
 		IsActive:       false,
 	}
@@ -210,7 +210,7 @@ func TestUpdateUser_NoRows(t *testing.T) {
 	ctx := context.Background()
 	user := &entity.User{
 		ID:             999,
-		SelectedAreaID: 0120200,
+		SelectedAreaID: "0120200",
 		NotifyTime:     time.Date(0, 1, 1, 10, 0, 0, 0, time.UTC),
 		IsActive:       false,
 	}

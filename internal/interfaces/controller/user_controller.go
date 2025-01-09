@@ -40,11 +40,6 @@ func (ctrl *UserController) Create(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid request body"})
 	}
 
-	selectedAreaID, err := strconv.Atoi(req.SelectedAreaID)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid selected area id"})
-	}
-
 	notifyTime, err := time.Parse("15:04", req.NotifyTime)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid notify time"})
@@ -52,7 +47,7 @@ func (ctrl *UserController) Create(c echo.Context) error {
 
 	user := &entity.User{
 		LINEUserID:     req.LINEUserID,
-		SelectedAreaID: selectedAreaID,
+		SelectedAreaID: req.SelectedAreaID,
 		NotifyTime:     notifyTime,
 	}
 
@@ -115,14 +110,9 @@ func (ctrl *UserController) Update(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid notify time"})
 	}
 
-	selectedAreaID, err := strconv.Atoi(req.SelectedAreaID)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid selectedArea ID"})
-	}
-
 	user := &entity.User{
 		ID:             userID,
-		SelectedAreaID: selectedAreaID,
+		SelectedAreaID: req.SelectedAreaID,
 		IsActive:       req.IsActive,
 		NotifyTime:     notifyTime,
 	}
