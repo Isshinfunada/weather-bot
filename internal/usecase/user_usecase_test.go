@@ -48,6 +48,14 @@ func (m *MockUserRepo) DeleteUser(ctx context.Context, userID int) error {
 	return args.Error(0)
 }
 
+func (m *MockUserRepo) FindUserByNotifyTimeRange(ctx context.Context, startTime, endTime time.Time) ([]*entity.User, error) {
+	args := m.Called(ctx, startTime, endTime)
+	if u := args.Get(0); u != nil {
+		return u.([]*entity.User), args.Error(1)
+	}
+	return nil, args.Error(1)
+}
+
 // UserUsecase の生成ヘルパー
 func setupUserUsecaseTest() (*MockUserRepo, usecase.UserUsecase) {
 	mockRepo := new(MockUserRepo)
