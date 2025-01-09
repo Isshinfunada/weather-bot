@@ -174,6 +174,120 @@ func TestFindUserByLINEUserID_NotFound(t *testing.T) {
 	assert.Nil(t, user)
 }
 
+func TestFindUsersByNotifyTimeRange_Success(t *testing.T) {
+	repo, mock, cleanup := setupMockDB(t)
+	defer cleanup()
+
+	ctx := context.Background()
+	// 通知時間範囲の設定（例: 08:00 ~ 09:00）
+	startTime := time.Date(0, 1, 1, 8, 0, 0, 0, time.UTC)
+	endTime := time.Date(0, 1, 1, 9, 0, 0, 0, time.UTC)
+
+	query := `
+		SELECT
+			id, line_user_id, selected_area_id, notify_time,
+			is_active, created_at, updated_at
+		FROM users
+		WHERE notify_time >= $1 AND notify_time < $2
+	`
+
+	// モックデータの設定
+	rows := sqlmock.NewRows([]string{
+		"id", "line_user_id", "selected_area_id", "notify_time",
+		"is_active", "created_at", "updated_at",
+	}).
+		AddRow(1, "U123", "0150000", time.Date(0, 1, 1, 8, 30, 0, 0, time.UTC), true, time.Now(), time.Now()).
+		AddRow(2, "U456", "0150100", time.Date(0, 1, 1, 8, 45, 0, 0, time.UTC), true, time.Now(), time.Now())
+
+	mock.ExpectQuery(regexp.QuoteMeta(query)).
+		WithArgs(startTime.Format("15:04"), endTime.Format("15:04")).
+		WillReturnRows(rows)
+
+	users, err := repo.FindUserByNotifyTimeRange(ctx, startTime, endTime)
+	require.NoError(t, err)
+	require.Len(t, users, 2)
+
+	assert.Equal(t, 1, users[0].ID)
+	assert.Equal(t, "U123", users[0].LINEUserID)
+	assert.Equal(t, "0150000", users[0].SelectedAreaID)
+	assert.Equal(t, "08:30", users[0].NotifyTime.Format("15:04"))
+	assert.True(t, users[0].IsActive)
+
+	assert.Equal(t, 2, users[1].ID)
+	assert.Equal(t, "U456", users[1].LINEUserID)
+	assert.Equal(t, "0150100", users[1].SelectedAreaID)
+	assert.Equal(t, "08:45", users[1].NotifyTime.Format("15:04"))
+	assert.True(t, users[1].IsActive)
+
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestFindUsersByNotifyTimeRange_NoUsers(t *testing.T) {
+	repo, mock, cleanup := setupMockDB(t)
+	defer cleanup()
+
+	ctx := context.Background()
+
+	// 通知時間範囲の設定（例: 10:00 ~ 11:00）
+	startTime := time.Date(0, 1, 1, 10, 0, 0, 0, time.UTC)
+	endTime := time.Date(0, 1, 1, 11, 0, 0, 0, time.UTC)
+
+	query := `
+		SELECT
+			id, line_user_id, selected_area_id, notify_time,
+			is_active, created_at, updated_at
+		FROM users
+		WHERE notify_time >= $1 AND notify_time < $2
+	`
+
+	// モックデータの設定（ユーザーなし）
+	rows := sqlmock.NewRows([]string{
+		"id", "line_user_id", "selected_area_id", "notify_time",
+		"is_active", "created_at", "updated_at",
+	})
+
+	mock.ExpectQuery(regexp.QuoteMeta(query)).
+		WithArgs(startTime.Format("15:04"), endTime.Format("15:04")).
+		WillReturnRows(rows)
+
+	users, err := repo.FindUserByNotifyTimeRange(ctx, startTime, endTime)
+	require.NoError(t, err)
+	assert.Len(t, users, 0)
+
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestFindUsersByNotifyTimeRange_QueryError(t *testing.T) {
+	repo, mock, cleanup := setupMockDB(t)
+	defer cleanup()
+
+	ctx := context.Background()
+
+	// 通知時間範囲の設定（例: 12:00 ~ 13:00）
+	startTime := time.Date(0, 1, 1, 12, 0, 0, 0, time.UTC)
+	endTime := time.Date(0, 1, 1, 13, 0, 0, 0, time.UTC)
+
+	query := `
+		SELECT
+			id, line_user_id, selected_area_id, notify_time,
+			is_active, created_at, updated_at
+		FROM users
+		WHERE notify_time >= $1 AND notify_time < $2
+	`
+
+	// モックエラーの設定
+	mock.ExpectQuery(regexp.QuoteMeta(query)).
+		WithArgs(startTime.Format("15:04"), endTime.Format("15:04")).
+		WillReturnError(errors.New("database error"))
+
+	users, err := repo.FindUserByNotifyTimeRange(ctx, startTime, endTime)
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "failed to query users by notify time range")
+	assert.Nil(t, users)
+
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
 func TestUpdateUser_Success(t *testing.T) {
 	repo, mock, cleanup := setupMockDB(t)
 	defer cleanup()
