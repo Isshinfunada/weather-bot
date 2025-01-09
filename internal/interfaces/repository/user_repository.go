@@ -139,7 +139,7 @@ func (r *userRepository) FindUserByNotifyTimeRange(ctx context.Context, start, e
 	var users []*entity.User
 	for rows.Next() {
 		var u entity.User
-		if err := rows.Scan(&u.ID, &u.LINEUserID, &u.SelectedAreaID, &u.NotifyTime, &u.CreatedAt, &u.UpdatedAt); err != nil {
+		if err := rows.Scan(&u.ID, &u.LINEUserID, &u.SelectedAreaID, &u.NotifyTime, &u.IsActive, &u.CreatedAt, &u.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("failed to scan user: %w", err)
 		}
 		users = append(users, &u)
