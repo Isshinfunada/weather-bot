@@ -118,9 +118,9 @@ func TestProcessWeatherForUser(t *testing.T) {
 	mockRuleRepo.On("GetRule", ctx, "123").Return(&entity.WeatherRule{WeatherCode: "123", IsNotifyTrigger: false}, nil)
 	mockRuleRepo.On("GetRule", ctx, "456").Return(&entity.WeatherRule{WeatherCode: "456", IsNotifyTrigger: true}, nil)
 
-	// 通知履歴挿入の期待設定
+	// 非同期処理のため、コンテキストを特定せずに受け入れる
 	mockNotificationRepo.
-		On("InsertNotificationHistory", ctx, mock.AnythingOfType("*entity.NotificationHistory")).
+		On("InsertNotificationHistory", mock.Anything, mock.AnythingOfType("*entity.NotificationHistory")).
 		Return(nil)
 
 	// 偽のJSONレスポンスを作成
@@ -167,6 +167,9 @@ func TestProcessWeatherForUser(t *testing.T) {
 	// ProcessWeatherForUser の実行
 	err = weatherUC.ProcessWeatherForUser(ctx, user)
 	assert.NoError(t, err)
+
+	// 非同期ゴルーチンの完了を待つ（短時間スリープ）
+	time.Sleep(100 * time.Millisecond)
 
 	// 各モックの呼び出し確認
 	mockAreaUC.AssertExpectations(t)

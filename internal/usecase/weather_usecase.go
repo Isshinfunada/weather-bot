@@ -129,9 +129,12 @@ func (u *weatherUsecase) ProcessWeatherForUser(ctx context.Context, user *entity
 		IsNotifyTrigger:  notify,
 	}
 
-	if err := u.notificationRepo.InsertNotificationHistory(ctx, history); err != nil {
-		return fmt.Errorf("failed to save notification history: %w", err)
-	}
+	go func(hist *entity.NotificationHistory) {
+		// HTTPリクエストのコンテキストに依存せずに処理を継続
+		if err := u.notificationRepo.InsertNotificationHistory(context.Background(), hist); err != nil {
+			fmt.Printf("failed to insert notification history for user %d: %v\n", hist.UserID, err)
+		}
+	}(history)
 
 	// コンソール出力
 	if notify {
