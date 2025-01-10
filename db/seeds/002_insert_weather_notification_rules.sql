@@ -13,8 +13,7 @@ INSERT INTO weather_notification_rules (weather_code, weather_description, is_no
 ('209', '霧', FALSE),
 ('210', '曇後時々晴', FALSE),
 ('211', '曇後晴', FALSE),
-('223', '曇日中時々晴', FALSE);
-
+('223', '曇日中時々晴', FALSE),
 /*雨を含むパターン*/
 ('102', '晴一時雨', TRUE),
 ('103', '晴時々雨', TRUE),
