@@ -27,15 +27,24 @@ func (ctrl *WeatherController) ProcessWeather(c echo.Context) error {
 	endParam := c.QueryParam("end")
 
 	if startParam != "" && endParam != "" {
-		// タイムフォーマットをRFC3339としてパース（例："2025-01-09T08:00:00Z"）
-		start, err = time.Parse(time.RFC3339, startParam)
+		// "HH:MM(08:00)を想定"
+		// 現在のJST日時を基準にする
+		now := time.Now().In(utils.JST)
+
+		// "15:04"フォーマットで時間をパース
+		parsedStart, err := time.ParseInLocation("1504", startParam, utils.JST)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid start time format"})
 		}
-		end, err = time.Parse(time.RFC3339, endParam)
+
+		parsedEnd, err := time.ParseInLocation("1504", endParam, utils.JST)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid end time format"})
 		}
+
+		// 今日の日付にパースした時刻を想定する
+		start = time.Date(now.Year(), now.Month(), now.Day(), parsedStart.Hour(), parsedStart.Minute(), 0, 0, utils.JST)
+		end = time.Date(now.Year(), now.Month(), now.Day(), parsedEnd.Hour(), parsedEnd.Minute(), 0, 0, utils.JST)
 	} else {
 		// クエリパラメータが無い場合、デフォルトで現在時刻の1時間前から現在時刻まで
 		end = time.Now().In(utils.JST)
