@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/Isshinfunada/weather-bot/internal/usecase"
+	"github.com/Isshinfunada/weather-bot/internal/utils"
 	"github.com/labstack/echo/v4"
 )
 
@@ -37,7 +38,7 @@ func (ctrl *WeatherController) ProcessWeather(c echo.Context) error {
 		}
 	} else {
 		// クエリパラメータが無い場合、デフォルトで現在時刻の1時間前から現在時刻まで
-		end = time.Now()
+		end = time.Now().In(utils.JST)
 		start = end.Add(-1 * time.Hour)
 	}
 

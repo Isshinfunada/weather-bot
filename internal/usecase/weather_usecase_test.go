@@ -12,6 +12,7 @@ import (
 
 	"github.com/Isshinfunada/weather-bot/internal/entity"
 	"github.com/Isshinfunada/weather-bot/internal/usecase"
+	"github.com/Isshinfunada/weather-bot/internal/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -186,8 +187,8 @@ func TestProcessWeatherForUsersInTimeRange(t *testing.T) {
 	weatherUC := usecase.NewWeatherUsecase(mockRuleRepo, mockNotificationRepo, mockUserRepo, mockAreaUC)
 
 	// 通知時間範囲を設定
-	startTime := time.Date(0, 1, 1, 8, 0, 0, 0, time.UTC)
-	endTime := time.Date(0, 1, 1, 9, 0, 0, 0, time.UTC)
+	startTime := time.Date(0, 1, 1, 8, 0, 0, 0, utils.JST)
+	endTime := time.Date(0, 1, 1, 9, 0, 0, 0, utils.JST)
 
 	// 指定時間帯のユーザーリストを設定
 	user := &entity.User{

@@ -11,6 +11,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/Isshinfunada/weather-bot/internal/entity"
 	"github.com/Isshinfunada/weather-bot/internal/interfaces/repository"
+	"github.com/Isshinfunada/weather-bot/internal/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -29,7 +30,7 @@ func TestCreateUser_Succeess(t *testing.T) {
 	defer cleanup()
 
 	ctx := context.Background()
-	now := time.Now()
+	now := time.Now().In(utils.JST)
 	user := &entity.User{
 		LINEUserID:     "U123",
 		SelectedAreaID: "0110000",
@@ -59,7 +60,7 @@ func TestCreateUser_QueryError(t *testing.T) {
 	user := &entity.User{
 		LINEUserID:     "U123",
 		SelectedAreaID: "0110000",
-		NotifyTime:     time.Now(),
+		NotifyTime:     time.Now().In(utils.JST),
 		IsActive:       true,
 	}
 
@@ -91,7 +92,7 @@ func TestFindUserByID_Success(t *testing.T) {
 	`
 	rows := sqlmock.NewRows([]string{
 		"id", "line_user_id", "selected_area_id", "notify_time", "is_active", "created_at", "updated_at",
-	}).AddRow(1, "U123", 0110000, time.Date(0, 1, 1, 9, 0, 0, 0, time.UTC), true, time.Now(), time.Now())
+	}).AddRow(1, "U123", 0110000, time.Date(0, 1, 1, 9, 0, 0, 0, utils.JST), true, time.Now().In(utils.JST), time.Now().In(utils.JST))
 
 	mock.ExpectQuery(regexp.QuoteMeta(query)).
 		WithArgs(1).
@@ -140,7 +141,7 @@ func TestFindUserByLINEUserID_Success(t *testing.T) {
 	`
 	rows := sqlmock.NewRows([]string{
 		"id", "line_user_id", "selected_area_id", "notify_time", "is_active", "created_at", "updated_at",
-	}).AddRow(1, "U123", 0110000, time.Date(0, 1, 1, 9, 0, 0, 0, time.UTC), true, time.Now(), time.Now())
+	}).AddRow(1, "U123", 0110000, time.Date(0, 1, 1, 9, 0, 0, 0, utils.JST), true, time.Now().In(utils.JST), time.Now().In(utils.JST))
 
 	mock.ExpectQuery(regexp.QuoteMeta(query)).
 		WithArgs("U123").
@@ -180,8 +181,8 @@ func TestFindUsersByNotifyTimeRange_Success(t *testing.T) {
 
 	ctx := context.Background()
 	// 通知時間範囲の設定（例: 08:00 ~ 09:00）
-	startTime := time.Date(0, 1, 1, 8, 0, 0, 0, time.UTC)
-	endTime := time.Date(0, 1, 1, 9, 0, 0, 0, time.UTC)
+	startTime := time.Date(0, 1, 1, 8, 0, 0, 0, utils.JST)
+	endTime := time.Date(0, 1, 1, 9, 0, 0, 0, utils.JST)
 
 	query := `
 		SELECT
@@ -196,8 +197,8 @@ func TestFindUsersByNotifyTimeRange_Success(t *testing.T) {
 		"id", "line_user_id", "selected_area_id", "notify_time",
 		"is_active", "created_at", "updated_at",
 	}).
-		AddRow(1, "U123", "0150000", time.Date(0, 1, 1, 8, 30, 0, 0, time.UTC), true, time.Now(), time.Now()).
-		AddRow(2, "U456", "0150100", time.Date(0, 1, 1, 8, 45, 0, 0, time.UTC), true, time.Now(), time.Now())
+		AddRow(1, "U123", "0150000", time.Date(0, 1, 1, 8, 30, 0, 0, utils.JST), true, time.Now().In(utils.JST), time.Now().In(utils.JST)).
+		AddRow(2, "U456", "0150100", time.Date(0, 1, 1, 8, 45, 0, 0, utils.JST), true, time.Now().In(utils.JST), time.Now().In(utils.JST))
 
 	mock.ExpectQuery(regexp.QuoteMeta(query)).
 		WithArgs(startTime.Format("15:04"), endTime.Format("15:04")).
@@ -229,8 +230,8 @@ func TestFindUsersByNotifyTimeRange_NoUsers(t *testing.T) {
 	ctx := context.Background()
 
 	// 通知時間範囲の設定（例: 10:00 ~ 11:00）
-	startTime := time.Date(0, 1, 1, 10, 0, 0, 0, time.UTC)
-	endTime := time.Date(0, 1, 1, 11, 0, 0, 0, time.UTC)
+	startTime := time.Date(0, 1, 1, 10, 0, 0, 0, utils.JST)
+	endTime := time.Date(0, 1, 1, 11, 0, 0, 0, utils.JST)
 
 	query := `
 		SELECT
@@ -264,8 +265,8 @@ func TestFindUsersByNotifyTimeRange_QueryError(t *testing.T) {
 	ctx := context.Background()
 
 	// 通知時間範囲の設定（例: 12:00 ~ 13:00）
-	startTime := time.Date(0, 1, 1, 12, 0, 0, 0, time.UTC)
-	endTime := time.Date(0, 1, 1, 13, 0, 0, 0, time.UTC)
+	startTime := time.Date(0, 1, 1, 12, 0, 0, 0, utils.JST)
+	endTime := time.Date(0, 1, 1, 13, 0, 0, 0, utils.JST)
 
 	query := `
 		SELECT
@@ -296,7 +297,7 @@ func TestUpdateUser_Success(t *testing.T) {
 	user := &entity.User{
 		ID:             1,
 		SelectedAreaID: "0120200",
-		NotifyTime:     time.Date(0, 1, 1, 10, 0, 0, 0, time.UTC),
+		NotifyTime:     time.Date(0, 1, 1, 10, 0, 0, 0, utils.JST),
 		IsActive:       false,
 	}
 
@@ -325,7 +326,7 @@ func TestUpdateUser_NoRows(t *testing.T) {
 	user := &entity.User{
 		ID:             999,
 		SelectedAreaID: "0120200",
-		NotifyTime:     time.Date(0, 1, 1, 10, 0, 0, 0, time.UTC),
+		NotifyTime:     time.Date(0, 1, 1, 10, 0, 0, 0, utils.JST),
 		IsActive:       false,
 	}
 

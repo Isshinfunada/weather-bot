@@ -8,6 +8,7 @@ import (
 
 	"github.com/Isshinfunada/weather-bot/internal/entity"
 	"github.com/Isshinfunada/weather-bot/internal/usecase"
+	"github.com/Isshinfunada/weather-bot/internal/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -67,12 +68,12 @@ func setupUserUsecaseTest() (*MockUserRepo, usecase.UserUsecase) {
 func TestUserUsecase_Create_Success(t *testing.T) {
 	mockRepo, uuc := setupUserUsecaseTest()
 	ctx := context.Background()
-	now := time.Now()
+	now := time.Now().In(utils.JST)
 
 	user := &entity.User{
 		LINEUserID:     "U123",
 		SelectedAreaID: "1",
-		NotifyTime:     time.Date(now.Year(), now.Month(), now.Day(), 9, 0, 0, 0, time.UTC),
+		NotifyTime:     time.Date(now.Year(), now.Month(), now.Day(), 9, 0, 0, 0, utils.JST),
 	}
 
 	// モック設定
@@ -91,7 +92,7 @@ func TestUserUsecase_Create_InvalidLINEUserID(t *testing.T) {
 	user := &entity.User{
 		LINEUserID:     "",
 		SelectedAreaID: "1",
-		NotifyTime:     time.Now(),
+		NotifyTime:     time.Now().In(utils.JST),
 	}
 
 	created, err := uuc.Create(ctx, user)
@@ -108,7 +109,7 @@ func TestUserUsecase_GetByID_Success(t *testing.T) {
 		ID:             1,
 		LINEUserID:     "U123",
 		SelectedAreaID: "1",
-		NotifyTime:     time.Now(),
+		NotifyTime:     time.Now().In(utils.JST),
 		IsActive:       true,
 	}
 
@@ -138,7 +139,7 @@ func TestUserUsecase_GetByLINEID_Success(t *testing.T) {
 		ID:             2,
 		LINEUserID:     "U456",
 		SelectedAreaID: "2",
-		NotifyTime:     time.Now(),
+		NotifyTime:     time.Now().In(utils.JST),
 		IsActive:       true,
 	}
 
@@ -167,7 +168,7 @@ func TestUserUsecase_Update_Success(t *testing.T) {
 	user := &entity.User{
 		ID:             1,
 		SelectedAreaID: "3",
-		NotifyTime:     time.Now(),
+		NotifyTime:     time.Now().In(utils.JST),
 		IsActive:       false,
 	}
 
@@ -185,7 +186,7 @@ func TestUserUsecase_Update_InvalidID(t *testing.T) {
 	user := &entity.User{
 		ID:             0,
 		SelectedAreaID: "3",
-		NotifyTime:     time.Now(),
+		NotifyTime:     time.Now().In(utils.JST),
 		IsActive:       false,
 	}
 

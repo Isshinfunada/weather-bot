@@ -10,6 +10,7 @@ import (
 
 	"github.com/Isshinfunada/weather-bot/internal/entity"
 	"github.com/Isshinfunada/weather-bot/internal/interfaces/repository"
+	"github.com/Isshinfunada/weather-bot/internal/utils"
 )
 
 type WeatherUsecase interface {
@@ -123,7 +124,7 @@ func (u *weatherUsecase) ProcessWeatherForUser(ctx context.Context, user *entity
 	// notification_historyに記載
 	history := &entity.NotificationHistory{
 		UserID:           user.ID,
-		NotificationTime: time.Now(),
+		NotificationTime: time.Now().In(utils.JST),
 		WeatherData:      body,
 		IsNotifyTrigger:  notify,
 	}

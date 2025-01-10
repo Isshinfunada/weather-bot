@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Isshinfunada/weather-bot/internal/entity"
+	"github.com/Isshinfunada/weather-bot/internal/utils"
 )
 
 type UserRepository interface {
@@ -35,7 +36,7 @@ func (r *userRepository) CreateUser(ctx context.Context, user *entity.User) (*en
 	RETURNING id
 	`
 
-	now := time.Now()
+	now := time.Now().In(utils.JST)
 	if user.CreatedAt.IsZero() {
 		user.CreatedAt = now
 	}
@@ -161,7 +162,7 @@ func (r *userRepository) UpdateUser(ctx context.Context, user *entity.User) erro
 		WHERE id = $5
 	`
 
-	user.UpdatedAt = time.Now()
+	user.UpdatedAt = time.Now().In(utils.JST)
 
 	result, err := r.db.ExecContext(
 		ctx,

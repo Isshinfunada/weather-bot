@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Isshinfunada/weather-bot/internal/entity"
+	"github.com/Isshinfunada/weather-bot/internal/utils"
 )
 
 type NotificationRepository interface {
@@ -28,7 +29,7 @@ func (r *notificationRepository) InsertNotificationHistory(ctx context.Context, 
 		RETURNING id
 	`
 
-	now := time.Now()
+	now := time.Now().In(utils.JST)
 	history.CreatedAt = now
 
 	err := r.db.QueryRowContext(ctx, query,
