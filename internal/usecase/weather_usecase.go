@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/Isshinfunada/weather-bot/internal/entity"
@@ -66,7 +67,12 @@ func (u *weatherUsecase) ProcessWeatherForUser(ctx context.Context, user *entity
 		return fmt.Errorf("failed to parse JSON: %w", err)
 	}
 
+	// 対象日を取得
+	// 過去データはレスポンス内に無いし、当日にこそ意味あると思っているので一旦現在の日付
+	targetDate := time.Now().In(utils.JST).Format("2006-01-02")
+
 	var weatherCodes []string
+	// JSONデータから対象日の天気コードを抽出
 	for _, forecast := range data {
 		timeSeries, ok := forecast["timeSeries"].([]interface{})
 		if !ok {
@@ -77,6 +83,26 @@ func (u *weatherUsecase) ProcessWeatherForUser(ctx context.Context, user *entity
 			if !ok {
 				continue
 			}
+
+			// timeDefines内に対象日が含まれているか確認
+			timeDefines, ok := tsMap["timeDefines"].([]interface{})
+			if !ok {
+				continue
+			}
+			includesTargetDate := false
+			for _, td := range timeDefines {
+				if tdStr, ok := td.(string); ok {
+					if strings.HasPrefix(tdStr, targetDate) {
+						includesTargetDate = true
+						break
+					}
+				}
+			}
+			if !includesTargetDate {
+				continue
+			}
+
+			// 対象日を含むtimeSeriesからエリア情報を抽出
 			areas, ok := tsMap["areas"].([]interface{})
 			if !ok {
 				continue

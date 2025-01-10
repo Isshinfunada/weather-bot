@@ -48,7 +48,7 @@ func (m *MockAreaUC) GetHierarchy(ctx context.Context, class20ID string) (*entit
 	return hierarchy, args.Error(1)
 }
 
-// DummyUserRepoはテストで使用しないメソッドのスタブです
+// DummyUserRepo はテストで使用しないメソッドのスタブです
 type DummyUserRepo struct{}
 
 func (d *DummyUserRepo) CreateUser(ctx context.Context, user *entity.User) (*entity.User, error) {
@@ -118,16 +118,19 @@ func TestProcessWeatherForUser(t *testing.T) {
 	mockRuleRepo.On("GetRule", ctx, "123").Return(&entity.WeatherRule{WeatherCode: "123", IsNotifyTrigger: false}, nil)
 	mockRuleRepo.On("GetRule", ctx, "456").Return(&entity.WeatherRule{WeatherCode: "456", IsNotifyTrigger: true}, nil)
 
-	// 非同期処理のため、コンテキストを特定せずに受け入れる
 	mockNotificationRepo.
 		On("InsertNotificationHistory", mock.Anything, mock.AnythingOfType("*entity.NotificationHistory")).
 		Return(nil)
 
-	// 偽のJSONレスポンスを作成
+	// 対象日を決める
+	targetDate := time.Now().In(utils.JST).Format("2006-01-02")
+
+	// 偽のJSONレスポンスを作成（対象日を含むtimeDefinesを追加）
 	fakeResponse := []map[string]interface{}{
 		{
 			"timeSeries": []interface{}{
 				map[string]interface{}{
+					"timeDefines": []interface{}{targetDate + "T11:00:00+09:00"},
 					"areas": []interface{}{
 						map[string]interface{}{
 							"area": map[string]interface{}{
@@ -144,7 +147,6 @@ func TestProcessWeatherForUser(t *testing.T) {
 	responseBody, err := json.Marshal(fakeResponse)
 	assert.NoError(t, err)
 
-	// http.Get をモックするために、http.DefaultTransport を上書き
 	originalTransport := http.DefaultTransport
 	http.DefaultTransport = roundTripperFunc(func(req *http.Request) (*http.Response, error) {
 		return &http.Response{
@@ -155,23 +157,17 @@ func TestProcessWeatherForUser(t *testing.T) {
 	})
 	defer func() { http.DefaultTransport = originalTransport }()
 
-	// WeatherUsecase の初期化
 	weatherUC := usecase.NewWeatherUsecase(mockRuleRepo, mockNotificationRepo, dummyUserRepo, mockAreaUC)
-
-	// ダミーユーザーの作成
 	user := &entity.User{
 		ID:             1,
 		SelectedAreaID: "1234567",
 	}
 
-	// ProcessWeatherForUser の実行
 	err = weatherUC.ProcessWeatherForUser(ctx, user)
 	assert.NoError(t, err)
 
-	// 非同期ゴルーチンの完了を待つ（短時間スリープ）
 	time.Sleep(100 * time.Millisecond)
 
-	// 各モックの呼び出し確認
 	mockAreaUC.AssertExpectations(t)
 	mockRuleRepo.AssertExpectations(t)
 	mockNotificationRepo.AssertExpectations(t)
@@ -186,14 +182,11 @@ func TestProcessWeatherForUsersInTimeRange(t *testing.T) {
 	mockAreaUC := new(MockAreaUC)
 	mockUserRepo := new(MockUserRepoForRange)
 
-	// Initialize WeatherUsecase with our mocks
 	weatherUC := usecase.NewWeatherUsecase(mockRuleRepo, mockNotificationRepo, mockUserRepo, mockAreaUC)
 
-	// 通知時間範囲を設定
 	startTime := time.Date(0, 1, 1, 8, 0, 0, 0, utils.JST)
 	endTime := time.Date(0, 1, 1, 9, 0, 0, 0, utils.JST)
 
-	// 指定時間帯のユーザーリストを設定
 	user := &entity.User{
 		ID:             1,
 		SelectedAreaID: "1234567",
@@ -204,7 +197,6 @@ func TestProcessWeatherForUsersInTimeRange(t *testing.T) {
 		On("FindUserByNotifyTimeRange", ctx, startTime, endTime).
 		Return(users, nil)
 
-	// areaUC.GetHierarchy の返却値設定
 	hierarchy := &entity.HierarchyArea{
 		Office:  &entity.AreaOffice{ID: "testOffice"},
 		Class10: &entity.AreaClass10{ID: "testClass10"},
@@ -213,19 +205,22 @@ func TestProcessWeatherForUsersInTimeRange(t *testing.T) {
 		On("GetHierarchy", ctx, fmt.Sprint(user.SelectedAreaID)).
 		Return(hierarchy, nil)
 
-	// 特定の天気コードに対するルール設定
 	mockRuleRepo.On("GetRule", ctx, "123").Return(&entity.WeatherRule{WeatherCode: "123", IsNotifyTrigger: false}, nil)
 	mockRuleRepo.On("GetRule", ctx, "456").Return(&entity.WeatherRule{WeatherCode: "456", IsNotifyTrigger: true}, nil)
 
 	mockNotificationRepo.
-		On("InsertNotificationHistory", ctx, mock.AnythingOfType("*entity.NotificationHistory")).
+		On("InsertNotificationHistory", mock.Anything, mock.AnythingOfType("*entity.NotificationHistory")).
 		Return(nil)
 
-	// 偽のJSONレスポンスを作成
+	// 対象日を決める
+	targetDate := time.Now().In(utils.JST).Format("2006-01-02")
+
+	// 偽のJSONレスポンスを作成（対象日を含むtimeDefinesを追加）
 	fakeResponse := []map[string]interface{}{
 		{
 			"timeSeries": []interface{}{
 				map[string]interface{}{
+					"timeDefines": []interface{}{targetDate + "T11:00:00+09:00"},
 					"areas": []interface{}{
 						map[string]interface{}{
 							"area": map[string]interface{}{
@@ -242,7 +237,6 @@ func TestProcessWeatherForUsersInTimeRange(t *testing.T) {
 	responseBody, err := json.Marshal(fakeResponse)
 	assert.NoError(t, err)
 
-	// http.Get をモック
 	originalTransport := http.DefaultTransport
 	http.DefaultTransport = roundTripperFunc(func(req *http.Request) (*http.Response, error) {
 		return &http.Response{
@@ -255,6 +249,8 @@ func TestProcessWeatherForUsersInTimeRange(t *testing.T) {
 
 	err = weatherUC.ProcessWeatherForUsersInTimeRange(ctx, startTime, endTime)
 	assert.NoError(t, err)
+
+	time.Sleep(100 * time.Millisecond)
 
 	mockUserRepo.AssertExpectations(t)
 	mockAreaUC.AssertExpectations(t)
