@@ -8,6 +8,7 @@ import (
 
 	"github.com/Isshinfunada/weather-bot/internal/entity"
 	"github.com/Isshinfunada/weather-bot/internal/usecase"
+	"github.com/Isshinfunada/weather-bot/internal/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -48,6 +49,14 @@ func (m *MockUserRepo) DeleteUser(ctx context.Context, userID int) error {
 	return args.Error(0)
 }
 
+func (m *MockUserRepo) FindUserByNotifyTimeRange(ctx context.Context, startTime, endTime time.Time) ([]*entity.User, error) {
+	args := m.Called(ctx, startTime, endTime)
+	if u := args.Get(0); u != nil {
+		return u.([]*entity.User), args.Error(1)
+	}
+	return nil, args.Error(1)
+}
+
 // UserUsecase の生成ヘルパー
 func setupUserUsecaseTest() (*MockUserRepo, usecase.UserUsecase) {
 	mockRepo := new(MockUserRepo)
@@ -59,12 +68,12 @@ func setupUserUsecaseTest() (*MockUserRepo, usecase.UserUsecase) {
 func TestUserUsecase_Create_Success(t *testing.T) {
 	mockRepo, uuc := setupUserUsecaseTest()
 	ctx := context.Background()
-	now := time.Now()
+	now := time.Now().In(utils.JST)
 
 	user := &entity.User{
 		LINEUserID:     "U123",
-		SelectedAreaID: 1,
-		NotifyTime:     time.Date(now.Year(), now.Month(), now.Day(), 9, 0, 0, 0, time.UTC),
+		SelectedAreaID: "1",
+		NotifyTime:     time.Date(now.Year(), now.Month(), now.Day(), 9, 0, 0, 0, utils.JST),
 	}
 
 	// モック設定
@@ -82,8 +91,8 @@ func TestUserUsecase_Create_InvalidLINEUserID(t *testing.T) {
 
 	user := &entity.User{
 		LINEUserID:     "",
-		SelectedAreaID: 1,
-		NotifyTime:     time.Now(),
+		SelectedAreaID: "1",
+		NotifyTime:     time.Now().In(utils.JST),
 	}
 
 	created, err := uuc.Create(ctx, user)
@@ -99,8 +108,8 @@ func TestUserUsecase_GetByID_Success(t *testing.T) {
 	expectedUser := &entity.User{
 		ID:             1,
 		LINEUserID:     "U123",
-		SelectedAreaID: 1,
-		NotifyTime:     time.Now(),
+		SelectedAreaID: "1",
+		NotifyTime:     time.Now().In(utils.JST),
 		IsActive:       true,
 	}
 
@@ -129,8 +138,8 @@ func TestUserUsecase_GetByLINEID_Success(t *testing.T) {
 	expectedUser := &entity.User{
 		ID:             2,
 		LINEUserID:     "U456",
-		SelectedAreaID: 2,
-		NotifyTime:     time.Now(),
+		SelectedAreaID: "2",
+		NotifyTime:     time.Now().In(utils.JST),
 		IsActive:       true,
 	}
 
@@ -158,8 +167,8 @@ func TestUserUsecase_Update_Success(t *testing.T) {
 
 	user := &entity.User{
 		ID:             1,
-		SelectedAreaID: 3,
-		NotifyTime:     time.Now(),
+		SelectedAreaID: "3",
+		NotifyTime:     time.Now().In(utils.JST),
 		IsActive:       false,
 	}
 
@@ -176,8 +185,8 @@ func TestUserUsecase_Update_InvalidID(t *testing.T) {
 
 	user := &entity.User{
 		ID:             0,
-		SelectedAreaID: 3,
-		NotifyTime:     time.Now(),
+		SelectedAreaID: "3",
+		NotifyTime:     time.Now().In(utils.JST),
 		IsActive:       false,
 	}
 

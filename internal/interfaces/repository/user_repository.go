@@ -7,12 +7,14 @@ import (
 	"time"
 
 	"github.com/Isshinfunada/weather-bot/internal/entity"
+	"github.com/Isshinfunada/weather-bot/internal/utils"
 )
 
 type UserRepository interface {
 	CreateUser(ctx context.Context, user *entity.User) (*entity.User, error)
 	FindUserByID(ctx context.Context, userID int) (*entity.User, error)
 	FindUserByLINEUserID(ctx context.Context, LINEUserID string) (*entity.User, error)
+	FindUserByNotifyTimeRange(ctx context.Context, start, end time.Time) ([]*entity.User, error)
 	UpdateUser(ctx context.Context, user *entity.User) error
 	DeleteUser(ctx context.Context, userID int) error
 }
@@ -34,7 +36,7 @@ func (r *userRepository) CreateUser(ctx context.Context, user *entity.User) (*en
 	RETURNING id
 	`
 
-	now := time.Now()
+	now := time.Now().In(utils.JST)
 	if user.CreatedAt.IsZero() {
 		user.CreatedAt = now
 	}
@@ -122,6 +124,33 @@ func (r *userRepository) FindUserByLINEUserID(ctx context.Context, LINEUserID st
 
 }
 
+func (r *userRepository) FindUserByNotifyTimeRange(ctx context.Context, start, end time.Time) ([]*entity.User, error) {
+	query := `
+		SELECT id, line_user_id, selected_area_id, notify_time, is_active, created_at, updated_at
+		FROM users
+		WHERE notify_time >= $1 AND notify_time < $2
+	`
+
+	rows, err := r.db.QueryContext(ctx, query, start.Format("15:04"), end.Format("15:04"))
+	if err != nil {
+		return nil, fmt.Errorf("failed to query users by notify time range: %w", err)
+	}
+	defer rows.Close()
+
+	var users []*entity.User
+	for rows.Next() {
+		var u entity.User
+		if err := rows.Scan(&u.ID, &u.LINEUserID, &u.SelectedAreaID, &u.NotifyTime, &u.IsActive, &u.CreatedAt, &u.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("failed to scan user: %w", err)
+		}
+		users = append(users, &u)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows error: %w", err)
+	}
+	return users, nil
+}
+
 func (r *userRepository) UpdateUser(ctx context.Context, user *entity.User) error {
 	query := `
 		UPDATE users
@@ -133,7 +162,7 @@ func (r *userRepository) UpdateUser(ctx context.Context, user *entity.User) erro
 		WHERE id = $5
 	`
 
-	user.UpdatedAt = time.Now()
+	user.UpdatedAt = time.Now().In(utils.JST)
 
 	result, err := r.db.ExecContext(
 		ctx,

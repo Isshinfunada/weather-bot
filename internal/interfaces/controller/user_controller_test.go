@@ -11,6 +11,7 @@ import (
 
 	"github.com/Isshinfunada/weather-bot/internal/entity"
 	"github.com/Isshinfunada/weather-bot/internal/interfaces/controller"
+	"github.com/Isshinfunada/weather-bot/internal/utils"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -78,12 +79,12 @@ func TestUserController_Create_Success(t *testing.T) {
 
 	c, rec := newTestContext(http.MethodPost, "/api/users", bodyBytes)
 
-	now := time.Now()
+	now := time.Now().In(utils.JST)
 	expectedUser := &entity.User{
 		ID:             1,
 		LINEUserID:     "U123",
-		SelectedAreaID: 1,
-		NotifyTime:     time.Date(now.Year(), now.Month(), now.Day(), 9, 0, 0, 0, time.UTC),
+		SelectedAreaID: "1",
+		NotifyTime:     time.Date(now.Year(), now.Month(), now.Day(), 9, 0, 0, 0, utils.JST),
 		IsActive:       false,
 	}
 
@@ -116,8 +117,8 @@ func TestUserController_GetByID_Success(t *testing.T) {
 	expectedUser := &entity.User{
 		ID:             1,
 		LINEUserID:     "U123",
-		SelectedAreaID: 1,
-		NotifyTime:     time.Now(),
+		SelectedAreaID: "1",
+		NotifyTime:     time.Now().In(utils.JST),
 		IsActive:       true,
 	}
 
@@ -149,8 +150,8 @@ func TestUserController_GetByLINEUserID_Success(t *testing.T) {
 	expectedUser := &entity.User{
 		ID:             2,
 		LINEUserID:     "U123",
-		SelectedAreaID: 2,
-		NotifyTime:     time.Now(),
+		SelectedAreaID: "2",
+		NotifyTime:     time.Now().In(utils.JST),
 		IsActive:       true,
 	}
 

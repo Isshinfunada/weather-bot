@@ -5,9 +5,10 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func RegisterRoutes(e *echo.Echo, userUC usecase.UserUsecase, areaUC usecase.AreaUseCase) {
+func RegisterRoutes(e *echo.Echo, userUC usecase.UserUsecase, areaUC usecase.AreaUseCase, weatherUC usecase.WeatherUsecase) {
 	userCtrl := NewUserController(userUC)
 	areaCtrl := NewAreaController(areaUC)
+	weatherCtrl := NewWeatherController(weatherUC)
 
 	// User
 	e.POST("/api/users", userCtrl.Create)                          //Create
@@ -18,4 +19,7 @@ func RegisterRoutes(e *echo.Echo, userUC usecase.UserUsecase, areaUC usecase.Are
 
 	// Area
 	e.GET("/api/areas/:class20_id", areaCtrl.GetHierarchy) //Read
+
+	// Weather processing endpoint
+	e.GET("/api/process_weather", weatherCtrl.ProcessWeather)
 }
