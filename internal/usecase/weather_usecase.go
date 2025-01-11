@@ -138,9 +138,10 @@ func (u *weatherUsecase) ProcessWeatherForUser(ctx context.Context, user *entity
 	for _, code := range weatherCodes {
 		rule, err := u.weatherRuleRepo.GetRule(ctx, code)
 		if err != nil {
-			// エラー発生時スキップ
+			fmt.Printf("Error retrieving rule for code %s: %v\n", code, err)
 			continue
 		}
+		fmt.Printf("Retrieved rule for code %s: %+v\n", code, rule)
 		if rule.IsNotifyTrigger {
 			notify = true
 			break
