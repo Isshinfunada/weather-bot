@@ -23,7 +23,7 @@ func NewWeatherRuleRepository(db *sql.DB) WeatherRuleRepository {
 func (r *weatherRuleRepository) GetRule(ctx context.Context, weatherCode string) (*entity.WeatherRule, error) {
 	query := `
 	SELECT weather_code, weather_description, is_notify_trigger
-	FROM weather_description_rules
+	FROM weather_notification_rules
 	WHERE weather_code = $1
 	`
 

@@ -36,7 +36,7 @@ func TestGetRule_Success(t *testing.T) {
 
 	query := regexp.QuoteMeta(`
 	SELECT weather_code, weather_description, is_notify_trigger
-	FROM weather_description_rules
+	FROM weather_notification_rules
 	WHERE weather_code = $1
 	`)
 
@@ -64,7 +64,7 @@ func TestGetRule_NotFound(t *testing.T) {
 
 	query := regexp.QuoteMeta(`
 	SELECT weather_code, weather_description, is_notify_trigger
-	FROM weather_description_rules
+	FROM weather_notification_rules
 	WHERE weather_code = $1
 	`)
 	mock.ExpectQuery(query).WithArgs(weatherCode).WillReturnError(sql.ErrNoRows)
@@ -86,7 +86,7 @@ func TestGetRule_QueryError(t *testing.T) {
 
 	query := regexp.QuoteMeta(`
 	SELECT weather_code, weather_description, is_notify_trigger
-	FROM weather_description_rules
+	FROM weather_notification_rules
 	WHERE weather_code = $1
 	`)
 	mock.ExpectQuery(query).WithArgs(weatherCode).WillReturnError(errors.New("db error"))
