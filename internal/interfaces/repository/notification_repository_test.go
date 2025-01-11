@@ -36,16 +36,27 @@ func TestInsertNotificationHistory_Success(t *testing.T) {
 		NotificationTime: now,
 		WeatherData:      []byte(`{"temp": "25"}`),
 		IsNotifyTrigger:  true,
+		WeatherCodes:     []string{"some_code"},
 	}
 
 	query := regexp.QuoteMeta(`
-		INSERT INTO notification_history (user_id, notification_time, weather_data, is_notify_trigger, created_at)
-		VALUES ($1, $2, $3, $4, $5)
-		RETURNING id
-	`)
+        INSERT INTO notification_history (
+            user_id, notification_time, is_notify_trigger, weather_data, 
+            weather_codes, created_at
+        )
+        VALUES ($1, $2, $3, $4, $5, $6)
+        RETURNING id
+    `)
 
 	mock.ExpectQuery(query).
-		WithArgs(history.UserID, history.NotificationTime, history.WeatherData, history.IsNotifyTrigger, sqlmock.AnyArg()).
+		WithArgs(
+			history.UserID,
+			history.NotificationTime,
+			history.IsNotifyTrigger,
+			history.WeatherData,
+			sqlmock.AnyArg(),
+			sqlmock.AnyArg(),
+		).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(42))
 
 	err := repo.InsertNotificationHistory(ctx, history)
@@ -66,16 +77,27 @@ func TestInsertNotificationHistory_Failure(t *testing.T) {
 		NotificationTime: now,
 		WeatherData:      []byte(`{"temp": "25"}`),
 		IsNotifyTrigger:  true,
+		WeatherCodes:     []string{"some_code"},
 	}
 
 	query := regexp.QuoteMeta(`
-		INSERT INTO notification_history (user_id, notification_time, weather_data, is_notify_trigger, created_at)
-		VALUES ($1, $2, $3, $4, $5)
-		RETURNING id
-	`)
+        INSERT INTO notification_history (
+            user_id, notification_time, is_notify_trigger, weather_data, 
+            weather_codes, created_at
+        )
+        VALUES ($1, $2, $3, $4, $5, $6)
+        RETURNING id
+    `)
 
 	mock.ExpectQuery(query).
-		WithArgs(history.UserID, history.NotificationTime, history.WeatherData, history.IsNotifyTrigger, sqlmock.AnyArg()).
+		WithArgs(
+			history.UserID,
+			history.NotificationTime,
+			history.IsNotifyTrigger,
+			history.WeatherData,
+			sqlmock.AnyArg(), // pq.Array(history.WeatherCodes) の結果として
+			sqlmock.AnyArg(),
+		).
 		WillReturnError(errors.New("insert failed"))
 
 	err := repo.InsertNotificationHistory(ctx, history)

@@ -6,7 +6,8 @@ type NotificationHistory struct {
 	ID               int
 	UserID           int
 	NotificationTime time.Time
-	WeatherData      []byte
 	IsNotifyTrigger  bool
+	WeatherCodes     []string
+	WeatherData      []byte
 	CreatedAt        time.Time
 }

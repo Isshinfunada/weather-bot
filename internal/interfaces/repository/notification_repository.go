@@ -8,6 +8,7 @@ import (
 
 	"github.com/Isshinfunada/weather-bot/internal/entity"
 	"github.com/Isshinfunada/weather-bot/internal/utils"
+	"github.com/lib/pq"
 )
 
 type NotificationRepository interface {
@@ -24,10 +25,13 @@ func NewNotificationRepository(db *sql.DB) NotificationRepository {
 
 func (r *notificationRepository) InsertNotificationHistory(ctx context.Context, history *entity.NotificationHistory) error {
 	query := `
-		INSERT INTO notification_history (user_id, notification_time, weather_data, is_notify_trigger, created_at)
-		VALUES ($1, $2, $3, $4, $5)
-		RETURNING id
-	`
+        INSERT INTO notification_history (
+            user_id, notification_time, is_notify_trigger, weather_data,
+            weather_codes, created_at
+        )
+        VALUES ($1, $2, $3, $4, $5, $6)
+        RETURNING id
+    `
 
 	now := time.Now().In(utils.JST)
 	history.CreatedAt = now
@@ -35,8 +39,9 @@ func (r *notificationRepository) InsertNotificationHistory(ctx context.Context, 
 	err := r.db.QueryRowContext(ctx, query,
 		history.UserID,
 		history.NotificationTime,
-		history.WeatherData,
 		history.IsNotifyTrigger,
+		history.WeatherData,
+		pq.Array(history.WeatherCodes),
 		history.CreatedAt,
 	).Scan(&history.ID)
 

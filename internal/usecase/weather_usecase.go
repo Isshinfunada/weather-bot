@@ -153,6 +153,7 @@ func (u *weatherUsecase) ProcessWeatherForUser(ctx context.Context, user *entity
 		NotificationTime: time.Now().In(utils.JST),
 		WeatherData:      body,
 		IsNotifyTrigger:  notify,
+		WeatherCodes:     weatherCodes,
 	}
 
 	go func(hist *entity.NotificationHistory) {
