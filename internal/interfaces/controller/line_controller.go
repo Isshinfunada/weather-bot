@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/Isshinfunada/weather-bot/internal/entity"
+	"github.com/Isshinfunada/weather-bot/internal/i18n"
 	"github.com/Isshinfunada/weather-bot/internal/usecase"
 	"github.com/labstack/echo/v4"
 	"github.com/line/line-bot-sdk-go/linebot"
@@ -59,8 +60,8 @@ func handleFollowEvent(c echo.Context, bot *linebot.Client, event *linebot.Event
 	}
 
 	replyMessages := []linebot.SendingMessage{
-		linebot.NewTextMessage("こんにちは！ご登録ありがとうございます。"),
-		linebot.NewTextMessage("市区町村を送信してね（例：新宿区、名古屋市など）"),
+		linebot.NewTextMessage(i18n.T("greeting")),
+		linebot.NewTextMessage(i18n.T("askCity")),
 	}
 	if _, err := bot.ReplyMessage(event.ReplyToken, replyMessages...).Do(); err != nil {
 		c.Logger().Errorf("Reply error: %v", err)
