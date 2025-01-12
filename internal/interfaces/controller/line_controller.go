@@ -3,6 +3,7 @@ package controller
 import (
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/Isshinfunada/weather-bot/internal/entity"
 	"github.com/Isshinfunada/weather-bot/internal/i18n"
@@ -82,10 +83,63 @@ func handleMessageEvent(c echo.Context, bot *linebot.Client, event *linebot.Even
 	}
 }
 
-// 現在のところ、processTextMessage は未実装のプレースホルダです。
-// 将来的に市区町村の受信・確認や通知時間の受信処理をここに実装します。
+// 市区町村の受信・確認や通知時間の受信処理をここに実装します。
 func processTextMessage(c echo.Context, bot *linebot.Client, event *linebot.Event, text string, userUC usecase.UserUsecase) {
 	// メッセージ内容に応じた処理をここで実装
-	// 例: "登録"コマンド以外のメッセージに対する処理など
 	c.Logger().Infof("Received text message: %s", text)
+
+	// ユーザーをLINEUserIDから取得
+	ctx := c.Request().Context()
+	user, err := userUC.GetByLINEID(ctx, event.Source.UserID)
+	if err != nil {
+		c.Logger().Errorf("Failed to get user: %v", err)
+		return
+	}
+	if user == nil {
+		c.Logger().Warn("User not found")
+		return
+	}
+
+	// 市区町村未設定
+	if user.SelectedAreaID == "" {
+		// ここで検索処理
+		replyText := i18n.T("searchCity")
+		if _, err := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(replyText)).Do(); err != nil {
+			c.Logger().Errorf("Reply error: %w", err)
+		}
+		return
+	}
+
+	// 通知時間未設定の場合
+	if user.NotifyTime.IsZero() {
+		// 受信テキストを時間として解析
+		parsedTime, err := time.Parse("15:04", text)
+		if err != nil {
+			replyText := i18n.T("invalidTimeFormat")
+			if _, err := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(replyText)).Do(); err != nil {
+				c.Logger().Errorf("Reply error: %v", err)
+			}
+			return
+		}
+		// 通知時間を更新
+		user.NotifyTime = parsedTime
+		err = userUC.Update(ctx, user)
+		if err != nil {
+			c.Logger().Errorf("Failed to update notify time: %v", err)
+			replyText := i18n.T("updateNotifyTimeFailed")
+			bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(replyText)).Do()
+			return
+		}
+		replyText := i18n.T("settingsComplete")
+		if _, err := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(replyText)).Do(); err != nil {
+			c.Logger().Errorf("Reply error: %v", err)
+		}
+		return
+	}
+
+	// それ以外の場合のデフォルト応答
+	defaultReply := i18n.T("defaultReply")
+	if _, err := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(defaultReply)).Do(); err != nil {
+		c.Logger().Errorf("Reply error: %v", err)
+	}
 }
