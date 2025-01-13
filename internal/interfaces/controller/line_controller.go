@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -8,11 +9,12 @@ import (
 	"github.com/Isshinfunada/weather-bot/internal/entity"
 	"github.com/Isshinfunada/weather-bot/internal/i18n"
 	"github.com/Isshinfunada/weather-bot/internal/usecase"
+	"github.com/Isshinfunada/weather-bot/internal/utils"
 	"github.com/labstack/echo/v4"
 	"github.com/line/line-bot-sdk-go/linebot"
 )
 
-func RegisterLINEWebhook(e *echo.Echo, userUC usecase.UserUsecase) {
+func RegisterLINEWebhook(e *echo.Echo, userUC usecase.UserUsecase, areaUC usecase.AreaUseCase) {
 	channelSecret := os.Getenv("LINE_CHANNEL_SECRET")
 	channelToken := os.Getenv("LINE_CHANNEL_ACCESS_TOKEN")
 
@@ -37,7 +39,7 @@ func RegisterLINEWebhook(e *echo.Echo, userUC usecase.UserUsecase) {
 			case linebot.EventTypeFollow:
 				handleFollowEvent(c, lineBot, event, userUC)
 			case linebot.EventTypeMessage:
-				handleMessageEvent(c, lineBot, event, userUC)
+				handleMessageEvent(c, lineBot, event, userUC, areaUC)
 			default:
 				c.Logger().Infof("Unhandled event type: %v", event.Type)
 			}
@@ -69,7 +71,7 @@ func handleFollowEvent(c echo.Context, bot *linebot.Client, event *linebot.Event
 	}
 }
 
-func handleMessageEvent(c echo.Context, bot *linebot.Client, event *linebot.Event, userUC usecase.UserUsecase) {
+func handleMessageEvent(c echo.Context, bot *linebot.Client, event *linebot.Event, userUC usecase.UserUsecase, areaUC usecase.AreaUseCase) {
 	if event.Type != linebot.EventTypeMessage {
 		return
 	}
@@ -77,14 +79,14 @@ func handleMessageEvent(c echo.Context, bot *linebot.Client, event *linebot.Even
 	switch msg := event.Message.(type) {
 	case *linebot.TextMessage:
 		text := msg.Text
-		processTextMessage(c, bot, event, text, userUC)
+		processTextMessage(c, bot, event, text, userUC, areaUC)
 	default:
 		c.Logger().Infof("Unhandled message type: %T", event.Message)
 	}
 }
 
 // 市区町村の受信・確認や通知時間の受信処理をここに実装します。
-func processTextMessage(c echo.Context, bot *linebot.Client, event *linebot.Event, text string, userUC usecase.UserUsecase) {
+func processTextMessage(c echo.Context, bot *linebot.Client, event *linebot.Event, text string, userUC usecase.UserUsecase, areaUC usecase.AreaUseCase) {
 	// メッセージ内容に応じた処理をここで実装
 	c.Logger().Infof("Received text message: %s", text)
 
@@ -102,14 +104,48 @@ func processTextMessage(c echo.Context, bot *linebot.Client, event *linebot.Even
 
 	// 市区町村未設定
 	if user.SelectedAreaID == "" {
-		// ここで検索処理
-		replyText := i18n.T("searchCity")
-		if _, err := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(replyText)).Do(); err != nil {
-			c.Logger().Errorf("Reply error: %w", err)
+		// ユーザー入力のバリデーションチェック
+		if !utils.IsKanji(text) {
+			replyText := i18n.T("kanjiValidationError")
+			bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(replyText)).Do()
+			return
 		}
+
+		// 市区町村名で検索
+		hierarchies, err := areaUC.SearchCityCandidates(ctx, text)
+		if err != nil || len(hierarchies) == 0 {
+			replyText := "指定された市区町村が見つかりませんでした。もう一度入力してください。"
+			bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(replyText)).Do()
+			return
+		}
+
+		if len(hierarchies) == 1 {
+			hierarchy := hierarchies[0]
+			confirmationMsg := fmt.Sprintf("%s : %s : %s : %s でよろしいですか？",
+				hierarchy.Office.Name,
+				hierarchy.Class10.Name,
+				hierarchy.Class15.Name,
+				hierarchy.Class20.Name,
+			)
+			bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(confirmationMsg)).Do()
+
+			// 確認応答の取り扱いを簡略化
+			user.SelectedAreaID = hierarchy.Class20.ID
+			if err := userUC.Update(ctx, user); err != nil {
+				c.Logger().Errorf("Failed to update user with selected area: %v", err)
+			}
+
+			replyText := i18n.T("askTime")
+			if _, err := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(replyText)).Do(); err != nil {
+				c.Logger().Errorf("Reply error: %v", err)
+			}
+			return
+		}
+		// 複数候補が見つかった場合の処理（部分検索ロジック未実装）
+		replyText := "複数の候補が見つかりました。具体的な地域名を教えてください。"
+		bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(replyText)).Do()
 		return
 	}
-
 	// 通知時間未設定の場合
 	if user.NotifyTime.IsZero() {
 		// 受信テキストを時間として解析
