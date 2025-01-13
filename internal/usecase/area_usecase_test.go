@@ -17,6 +17,15 @@ type MockAreaRepo struct {
 	mock.Mock
 }
 
+func (m *MockAreaRepo) FindAreasByname(ctx context.Context, name string) ([]*entity.AreaClass20, error) {
+	args := m.Called(ctx, name)
+	var areas []*entity.AreaClass20
+	if val := args.Get(0); val != nil {
+		areas = val.([]*entity.AreaClass20)
+	}
+	return areas, args.Error(1)
+}
+
 func (m *MockAreaRepo) FindHierarchyByClass20ID(ctx context.Context, class20ID string) (*entity.HierarchyArea, error) {
 	args := m.Called(ctx, class20ID)
 	// nilポインタの可能性を考慮
