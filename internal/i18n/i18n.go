@@ -9,6 +9,7 @@ var messages = map[string]string{
 	"settingsComplete":       "設定が完了しました！これで雨の情報をお届けします。",
 	"defaultReply":           "現在の設定状況です。必要に応じて情報を更新してください。",
 	"kanjiValidationError":   "市区町村名は漢字で入力してください。",
+	"altanativesNotFound":    "代替候補が見つかりませんでした。別の市区町村名を入力してください。",
 }
 
 // T は指定されたキーに対応するローカライズされたメッセージを返します。
