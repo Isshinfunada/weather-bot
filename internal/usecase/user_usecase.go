@@ -8,7 +8,7 @@ import (
 	"github.com/Isshinfunada/weather-bot/internal/interfaces/repository"
 )
 
-type UserUsecase interface {
+type UserUseCase interface {
 	Create(ctx context.Context, user *entity.User) (*entity.User, error)
 	GetByID(ctx context.Context, userID int) (*entity.User, error)
 	GetByLINEID(ctx context.Context, LINEUserID string) (*entity.User, error)
@@ -20,7 +20,7 @@ type userUsecase struct {
 	userRepo repository.UserRepository
 }
 
-func NewUserUseCase(ur repository.UserRepository) UserUsecase {
+func NewUserUseCase(ur repository.UserRepository) UserUseCase {
 	return &userUsecase{
 		userRepo: ur,
 	}

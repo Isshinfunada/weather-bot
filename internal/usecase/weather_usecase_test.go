@@ -39,6 +39,15 @@ func (m *MockNotificationRepo) InsertNotificationHistory(ctx context.Context, hi
 
 type MockAreaUC struct{ mock.Mock }
 
+func (m *MockAreaUC) SearchCityCandidates(ctx context.Context, query string) ([]*entity.HierarchyArea, error) {
+	args := m.Called(ctx, query)
+	var candidates []*entity.HierarchyArea
+	if args.Get(0) != nil {
+		candidates = args.Get(0).([]*entity.HierarchyArea)
+	}
+	return candidates, args.Error(1)
+}
+
 func (m *MockAreaUC) GetHierarchy(ctx context.Context, class20ID string) (*entity.HierarchyArea, error) {
 	args := m.Called(ctx, class20ID)
 	var hierarchy *entity.HierarchyArea

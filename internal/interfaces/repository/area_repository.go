@@ -11,6 +11,7 @@ import (
 // インターフェース
 type AreaRepository interface {
 	FindHierarchyByClass20ID(ctx context.Context, class20ID string) (*entity.HierarchyArea, error)
+	FindAreasByname(ctx context.Context, namePattern string) ([]*entity.AreaClass20, error)
 }
 
 // 実装構造体
@@ -68,4 +69,31 @@ func (r *areaRepository) FindHierarchyByClass20ID(ctx context.Context, class20ID
 		Office:  &o,
 		Center:  &ct,
 	}, nil
+}
+
+func (r *areaRepository) FindAreasByname(ctx context.Context, namePattern string) ([]*entity.AreaClass20, error) {
+	query := `
+		SELECT id, name, en_name, parent_id
+		FROM area_class20
+		WHERE name LIKE $1
+	`
+
+	rows, err := r.db.QueryContext(ctx, query, namePattern)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var areas []*entity.AreaClass20
+	for rows.Next() {
+		var area entity.AreaClass20
+		if err := rows.Scan(&area.ID, &area.Name, &area.EnName, &area.ParentID); err != nil {
+			return nil, err
+		}
+		areas = append(areas, &area)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return areas, nil
 }

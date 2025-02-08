@@ -3,10 +3,13 @@ CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     line_user_id VARCHAR(255) UNIQUE NOT NULL,
     selected_area_id VARCHAR(10) REFERENCES area_class20(id),
+    selected_area_office_id VARCHAR(10) REFERENCES area_office(id),
+    selected_area_class15_id VARCHAR(10) REFERENCES area_class15(id),
     notify_time TIME NOT NULL,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status VARCHAR(255) NOT NULL DEFAULT 'awaiting_prefecture'
 );
 
 -- +goose Down

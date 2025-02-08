@@ -10,6 +10,7 @@ import (
 
 type AreaUseCase interface {
 	GetHierarchy(ctx context.Context, class20ID string) (*entity.HierarchyArea, error)
+	SearchCityCandidates(ctx context.Context, cityName string) ([]*entity.HierarchyArea, error)
 }
 
 type areaUseCase struct {
@@ -43,4 +44,23 @@ func validateClass20ID(class20ID string, length int) error {
 		return fmt.Errorf("id length is invalid")
 	}
 	return nil
+}
+
+func (u *areaUseCase) SearchCityCandidates(ctx context.Context, cityName string) ([]*entity.HierarchyArea, error) {
+	areas, err := u.areaRepo.FindAreasByname(ctx, cityName)
+	if err != nil {
+		return nil, err
+	}
+
+	var hierarchies []*entity.HierarchyArea
+	for _, area := range areas {
+		hierarchey, err := u.areaRepo.FindHierarchyByClass20ID(ctx, area.ID)
+		if err != nil {
+			continue
+		}
+		if hierarchey != nil {
+			hierarchies = append(hierarchies, hierarchey)
+		}
+	}
+	return hierarchies, nil
 }

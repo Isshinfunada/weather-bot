@@ -57,16 +57,16 @@ func (m *MockUserRepo) FindUserByNotifyTimeRange(ctx context.Context, startTime,
 	return nil, args.Error(1)
 }
 
-// UserUsecase の生成ヘルパー
-func setupUserUsecaseTest() (*MockUserRepo, usecase.UserUsecase) {
+// UserUseCase の生成ヘルパー
+func setupUserUseCaseTest() (*MockUserRepo, usecase.UserUseCase) {
 	mockRepo := new(MockUserRepo)
 	usecase := usecase.NewUserUseCase(mockRepo)
 	return mockRepo, usecase
 }
 
 // Create のテスト
-func TestUserUsecase_Create_Success(t *testing.T) {
-	mockRepo, uuc := setupUserUsecaseTest()
+func TestUserUseCase_Create_Success(t *testing.T) {
+	mockRepo, uuc := setupUserUseCaseTest()
 	ctx := context.Background()
 	now := time.Now().In(utils.JST)
 
@@ -85,8 +85,8 @@ func TestUserUsecase_Create_Success(t *testing.T) {
 	mockRepo.AssertExpectations(t)
 }
 
-func TestUserUsecase_Create_InvalidLINEUserID(t *testing.T) {
-	_, uuc := setupUserUsecaseTest()
+func TestUserUseCase_Create_InvalidLINEUserID(t *testing.T) {
+	_, uuc := setupUserUseCaseTest()
 	ctx := context.Background()
 
 	user := &entity.User{
@@ -101,8 +101,8 @@ func TestUserUsecase_Create_InvalidLINEUserID(t *testing.T) {
 }
 
 // GetByID のテスト
-func TestUserUsecase_GetByID_Success(t *testing.T) {
-	mockRepo, uuc := setupUserUsecaseTest()
+func TestUserUseCase_GetByID_Success(t *testing.T) {
+	mockRepo, uuc := setupUserUseCaseTest()
 	ctx := context.Background()
 
 	expectedUser := &entity.User{
@@ -121,8 +121,8 @@ func TestUserUsecase_GetByID_Success(t *testing.T) {
 	mockRepo.AssertExpectations(t)
 }
 
-func TestUserUsecase_GetByID_InvalidID(t *testing.T) {
-	_, uuc := setupUserUsecaseTest()
+func TestUserUseCase_GetByID_InvalidID(t *testing.T) {
+	_, uuc := setupUserUseCaseTest()
 	ctx := context.Background()
 
 	user, err := uuc.GetByID(ctx, 0)
@@ -131,8 +131,8 @@ func TestUserUsecase_GetByID_InvalidID(t *testing.T) {
 }
 
 // GetByLINEID のテスト
-func TestUserUsecase_GetByLINEID_Success(t *testing.T) {
-	mockRepo, uuc := setupUserUsecaseTest()
+func TestUserUseCase_GetByLINEID_Success(t *testing.T) {
+	mockRepo, uuc := setupUserUseCaseTest()
 	ctx := context.Background()
 
 	expectedUser := &entity.User{
@@ -151,8 +151,8 @@ func TestUserUsecase_GetByLINEID_Success(t *testing.T) {
 	mockRepo.AssertExpectations(t)
 }
 
-func TestUserUsecase_GetByLINEID_EmptyID(t *testing.T) {
-	_, uuc := setupUserUsecaseTest()
+func TestUserUseCase_GetByLINEID_EmptyID(t *testing.T) {
+	_, uuc := setupUserUseCaseTest()
 	ctx := context.Background()
 
 	user, err := uuc.GetByLINEID(ctx, "")
@@ -161,8 +161,8 @@ func TestUserUsecase_GetByLINEID_EmptyID(t *testing.T) {
 }
 
 // Update のテスト
-func TestUserUsecase_Update_Success(t *testing.T) {
-	mockRepo, uuc := setupUserUsecaseTest()
+func TestUserUseCase_Update_Success(t *testing.T) {
+	mockRepo, uuc := setupUserUseCaseTest()
 	ctx := context.Background()
 
 	user := &entity.User{
@@ -179,8 +179,8 @@ func TestUserUsecase_Update_Success(t *testing.T) {
 	mockRepo.AssertExpectations(t)
 }
 
-func TestUserUsecase_Update_InvalidID(t *testing.T) {
-	_, uuc := setupUserUsecaseTest()
+func TestUserUseCase_Update_InvalidID(t *testing.T) {
+	_, uuc := setupUserUseCaseTest()
 	ctx := context.Background()
 
 	user := &entity.User{
@@ -195,8 +195,8 @@ func TestUserUsecase_Update_InvalidID(t *testing.T) {
 }
 
 // Delete のテスト
-func TestUserUsecase_Delete_Success(t *testing.T) {
-	mockRepo, uuc := setupUserUsecaseTest()
+func TestUserUseCase_Delete_Success(t *testing.T) {
+	mockRepo, uuc := setupUserUseCaseTest()
 	ctx := context.Background()
 
 	mockRepo.On("DeleteUser", ctx, 1).Return(nil)
@@ -206,16 +206,16 @@ func TestUserUsecase_Delete_Success(t *testing.T) {
 	mockRepo.AssertExpectations(t)
 }
 
-func TestUserUsecase_Delete_InvalidID(t *testing.T) {
-	_, uuc := setupUserUsecaseTest()
+func TestUserUseCase_Delete_InvalidID(t *testing.T) {
+	_, uuc := setupUserUseCaseTest()
 	ctx := context.Background()
 
 	err := uuc.Delete(ctx, 0)
 	assert.EqualError(t, err, "invalid user id")
 }
 
-func TestUserUsecase_Delete_Error(t *testing.T) {
-	mockRepo, uuc := setupUserUsecaseTest()
+func TestUserUseCase_Delete_Error(t *testing.T) {
+	mockRepo, uuc := setupUserUseCaseTest()
 	ctx := context.Background()
 
 	mockRepo.On("DeleteUser", ctx, 2).Return(errors.New("delete failed"))
