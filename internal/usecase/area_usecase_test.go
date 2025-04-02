@@ -36,6 +36,42 @@ func (m *MockAreaRepo) FindHierarchyByClass20ID(ctx context.Context, class20ID s
 	return hier, args.Error(1)
 }
 
+func (m *MockAreaRepo) FindOfficeByName(ctx context.Context, name string) (*entity.AreaOffice, error) {
+	args := m.Called(ctx, name)
+	var office *entity.AreaOffice
+	if val := args.Get(0); val != nil {
+		office = val.(*entity.AreaOffice)
+	}
+	return office, args.Error(1)
+}
+
+func (m *MockAreaRepo) FindAreaClass10ByOfficeID(ctx context.Context, officeID string) ([]*entity.AreaClass10, error) {
+	args := m.Called(ctx, officeID)
+	var areas []*entity.AreaClass10
+	if val := args.Get(0); val != nil {
+		areas = val.([]*entity.AreaClass10)
+	}
+	return areas, args.Error(1)
+}
+
+func (m *MockAreaRepo) FindAreaClass15ByClass10ID(ctx context.Context, class10ID string) ([]*entity.AreaClass15, error) {
+	args := m.Called(ctx, class10ID)
+	var areas []*entity.AreaClass15
+	if val := args.Get(0); val != nil {
+		areas = val.([]*entity.AreaClass15)
+	}
+	return areas, args.Error(1)
+}
+
+func (m *MockAreaRepo) FindAreaClass20ByClass15ID(ctx context.Context, class15ID string) ([]*entity.AreaClass20, error) {
+	args := m.Called(ctx, class15ID)
+	var areas []*entity.AreaClass20
+	if val := args.Get(0); val != nil {
+		areas = val.([]*entity.AreaClass20)
+	}
+	return areas, args.Error(1)
+}
+
 // テスト用セットアップ関数
 func setupAreaUsecaseTest() (*MockAreaRepo, usecase.AreaUseCase) {
 	mockRepo := new(MockAreaRepo)

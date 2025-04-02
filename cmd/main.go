@@ -68,7 +68,7 @@ func runApp() error {
 
 	controller.RegisterRoutes(e, userUC, areaUC, weatherUC)
 
-	controller.RegisterLINEWebhook(e, userUC, areaUC)
+	controller.RegisterLINEWebhook(e, userUC, areaUC, areaRepo)
 
 	// Echoサーバーの起動
 	e.Logger.Fatal(e.Start(":8080"))
