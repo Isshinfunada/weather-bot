@@ -17,12 +17,12 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-// MockUserUsecase は usecase.UserUsecase インターフェースのモック実装
-type MockUserUsecase struct {
+// MockUserUseCase は usecase.UserUseCase インターフェースのモック実装
+type MockUserUseCase struct {
 	mock.Mock
 }
 
-func (m *MockUserUsecase) Create(ctx context.Context, user *entity.User) (*entity.User, error) {
+func (m *MockUserUseCase) Create(ctx context.Context, user *entity.User) (*entity.User, error) {
 	args := m.Called(ctx, user)
 	if u := args.Get(0); u != nil {
 		return u.(*entity.User), args.Error(1)
@@ -30,7 +30,7 @@ func (m *MockUserUsecase) Create(ctx context.Context, user *entity.User) (*entit
 	return nil, args.Error(1)
 }
 
-func (m *MockUserUsecase) GetByID(ctx context.Context, userID int) (*entity.User, error) {
+func (m *MockUserUseCase) GetByID(ctx context.Context, userID int) (*entity.User, error) {
 	args := m.Called(ctx, userID)
 	if u := args.Get(0); u != nil {
 		return u.(*entity.User), args.Error(1)
@@ -38,7 +38,7 @@ func (m *MockUserUsecase) GetByID(ctx context.Context, userID int) (*entity.User
 	return nil, args.Error(1)
 }
 
-func (m *MockUserUsecase) GetByLINEID(ctx context.Context, LINEUserID string) (*entity.User, error) {
+func (m *MockUserUseCase) GetByLINEID(ctx context.Context, LINEUserID string) (*entity.User, error) {
 	args := m.Called(ctx, LINEUserID)
 	if u := args.Get(0); u != nil {
 		return u.(*entity.User), args.Error(1)
@@ -46,12 +46,12 @@ func (m *MockUserUsecase) GetByLINEID(ctx context.Context, LINEUserID string) (*
 	return nil, args.Error(1)
 }
 
-func (m *MockUserUsecase) Update(ctx context.Context, user *entity.User) error {
+func (m *MockUserUseCase) Update(ctx context.Context, user *entity.User) error {
 	args := m.Called(ctx, user)
 	return args.Error(0)
 }
 
-func (m *MockUserUsecase) Delete(ctx context.Context, userID int) error {
+func (m *MockUserUseCase) Delete(ctx context.Context, userID int) error {
 	args := m.Called(ctx, userID)
 	return args.Error(0)
 }
@@ -67,7 +67,7 @@ func newTestContext(method, path string, body []byte) (echo.Context, *httptest.R
 
 // Create エンドポイントのテスト（正常系）
 func TestUserController_Create_Success(t *testing.T) {
-	mockUC := new(MockUserUsecase)
+	mockUC := new(MockUserUseCase)
 	userCtrl := controller.NewUserController(mockUC)
 
 	reqBody := controller.CreateUserRequest{
@@ -102,7 +102,7 @@ func TestUserController_Create_Success(t *testing.T) {
 
 // GetByID エンドポイントのテスト（正常系）
 func TestUserController_GetByID_Success(t *testing.T) {
-	mockUC := new(MockUserUsecase)
+	mockUC := new(MockUserUseCase)
 	userCtrl := controller.NewUserController(mockUC)
 
 	// URL パラメータとして id を設定するために Echo コンテキストを作成
@@ -136,7 +136,7 @@ func TestUserController_GetByID_Success(t *testing.T) {
 
 // GetByLINEUserID エンドポイントのテスト（正常系）
 func TestUserController_GetByLINEUserID_Success(t *testing.T) {
-	mockUC := new(MockUserUsecase)
+	mockUC := new(MockUserUseCase)
 	userCtrl := controller.NewUserController(mockUC)
 
 	e := echo.New()
@@ -169,7 +169,7 @@ func TestUserController_GetByLINEUserID_Success(t *testing.T) {
 
 // Update エンドポイントのテスト（正常系）
 func TestUserController_Update_Success(t *testing.T) {
-	mockUC := new(MockUserUsecase)
+	mockUC := new(MockUserUseCase)
 	userCtrl := controller.NewUserController(mockUC)
 
 	reqBody := controller.UpdateUserRequest{
@@ -204,7 +204,7 @@ func TestUserController_Update_Success(t *testing.T) {
 
 // Delete エンドポイントのテスト（正常系）
 func TestUserController_Delete_Success(t *testing.T) {
-	mockUC := new(MockUserUsecase)
+	mockUC := new(MockUserUseCase)
 	userCtrl := controller.NewUserController(mockUC)
 
 	e := echo.New()

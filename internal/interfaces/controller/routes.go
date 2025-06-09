@@ -5,7 +5,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func RegisterRoutes(e *echo.Echo, userUC usecase.UserUsecase, areaUC usecase.AreaUseCase, weatherUC usecase.WeatherUsecase) {
+func RegisterRoutes(e *echo.Echo, userUC usecase.UserUseCase, areaUC usecase.AreaUseCase, weatherUC usecase.WeatherUsecase) {
 	userCtrl := NewUserController(userUC)
 	areaCtrl := NewAreaController(areaUC)
 	weatherCtrl := NewWeatherController(weatherUC)

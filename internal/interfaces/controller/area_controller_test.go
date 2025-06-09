@@ -20,6 +20,14 @@ type MockAreaUseCase struct {
 	mock.Mock
 }
 
+func (m *MockAreaUseCase) SearchCityCandidates(ctx context.Context, query string) ([]*entity.HierarchyArea, error) {
+	args := m.Called(ctx, query)
+	if c := args.Get(0); c != nil {
+		return c.([]*entity.HierarchyArea), args.Error(1)
+	}
+	return nil, args.Error(1)
+}
+
 func (m *MockAreaUseCase) GetHierarchy(ctx context.Context, class20ID string) (*entity.HierarchyArea, error) {
 	args := m.Called(ctx, class20ID)
 	if h := args.Get(0); h != nil {
